@@ -5,7 +5,20 @@ Monorepo gồm 2 project độc lập:
 - `finmatch-web/` — Next.js/TypeScript/Tailwind frontend (giữ nguyên UI gốc)
 - `finmatch-api/` — NestJS backend thật (Postgres, JWT auth, AI streaming, cron crawler)
 
-## Chạy nhanh bằng Docker (khuyến nghị)
+## 🚀 Deploy lên Vercel (frontend) + Railway (backend)
+
+Xem hướng dẫn từng bước đầy đủ tại **[`DEPLOY.md`](./DEPLOY.md)**.
+
+Tóm tắt: Vercel chỉ host được phần frontend Next.js (serverless, không giữ
+được kết nối Postgres/cron liên tục); backend NestJS cần một nơi chạy
+container thường trực như Railway. `DEPLOY.md` hướng dẫn cả 2, kèm cách
+nối chúng lại với nhau bằng biến môi trường.
+
+Nếu chỉ muốn xem giao diện chạy ngay trên Vercel mà chưa cần backend thật,
+để `NEXT_PUBLIC_USE_MOCK=true` — toàn bộ trang vẫn chạy đầy đủ với dữ liệu
+mẫu.
+
+## Chạy nhanh bằng Docker (local, không cần Vercel/Railway)
 
 ```bash
 cp finmatch-api/.env.example finmatch-api/.env
