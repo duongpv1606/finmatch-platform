@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/*
+  ORIGINAL DESIGN SYSTEM — imported verbatim from finmatch-ai-v5.html
+  Do NOT redesign. This file is the single source of truth for the
+  premium fintech look (Stripe/Linear/Revolut/Mercury inspired).
+  Components use these exact class names so the UI stays pixel-identical.
+*/
+@import "./original-design.css";
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
