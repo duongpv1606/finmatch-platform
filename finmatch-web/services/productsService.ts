@@ -4,7 +4,7 @@
 // REAL BACKEND CONTRACT (implement in NestJS):
 //   GET  /api/products?category=loan&sort=rate_asc
 //   GET  /api/products/:id
-//   GET  /api/rates/history?productId=xxx&months=12
+//   GET  /api/products/:id/rate-history?months=12
 //
 // Real rate data has NO official open API from VPBank/MB/Techcombank/
 // ACB/Vietcombank. Two realistic paths:
@@ -115,6 +115,6 @@ export async function getRateHistory(
     return mockDelay(points);
   }
   return apiFetch<RateHistoryPoint[]>(
-    `/rates/history?productId=${productId}&months=${months}`
+    `/products/${productId}/rate-history?months=${months}`
   );
 }
