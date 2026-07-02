@@ -17,6 +17,7 @@ export function ChatPanel({ initialQuery }: { initialQuery?: string }) {
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
+  const sessionIdRef = useRef<string>(crypto.randomUUID());
 
   useEffect(() => {
     if (initialQuery && !startedRef.current) {
@@ -51,7 +52,7 @@ export function ChatPanel({ initialQuery }: { initialQuery?: string }) {
     setInput("");
 
     let acc = "";
-    for await (const chunk of streamChat([...messages, userMsg])) {
+    for await (const chunk of streamChat([...messages, userMsg], sessionIdRef.current)) {
       acc += chunk;
       setMessages((prev) =>
         prev.map((m) => (m.id === aiMsgId ? { ...m, content: acc } : m))

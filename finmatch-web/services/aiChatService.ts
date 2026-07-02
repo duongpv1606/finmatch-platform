@@ -27,7 +27,8 @@ const MOCK_REPLY =
   "_Đây là phản hồi mẫu — kết nối OpenAI/Claude/Gemini ở backend để có tư vấn thật._";
 
 export async function* streamChat(
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  sessionId: string
 ): AsyncGenerator<string> {
   if (USE_MOCK) {
     for (const word of MOCK_REPLY.split(" ")) {
@@ -40,9 +41,15 @@ export async function* streamChat(
   const res = await fetch(`${API_BASE_URL}/ai/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({
+      sessionId,
+      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+    }),
   });
-  if (!res.body) throw new Error("No stream body from AI endpoint");
+  if (!res.ok || !res.body) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`AI chat request failed (${res.status}): ${text}`);
+  }
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
