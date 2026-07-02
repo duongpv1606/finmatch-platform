@@ -12,15 +12,26 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { getRateHistory } from "@/services/productsService";
+import { getProducts, getRateHistory } from "@/services/productsService";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
 export function RateChart() {
   const [months, setMonths] = useState(6);
+
+  // Chart tracks a real "loan" product's rate over time — fetch the
+  // cheapest loan product first, then pull its history. No more hardcoded
+  // fake product id.
+  const { data: loanProducts } = useQuery({
+    queryKey: ["products", "loan", "for-chart"],
+    queryFn: () => getProducts("loan"),
+  });
+  const productId = loanProducts?.[0]?.id;
+
   const { data } = useQuery({
-    queryKey: ["rateHistory", months],
-    queryFn: () => getRateHistory("vcb-home-01", months),
+    queryKey: ["rateHistory", productId, months],
+    queryFn: () => getRateHistory(productId as string, months),
+    enabled: Boolean(productId),
   });
 
   return (
@@ -47,6 +58,12 @@ export function RateChart() {
         </div>
       </div>
       <div className="chart-wrap" style={{ height: 240 }}>
+        {!productId && (
+          <div style={{ color: "var(--gray-400)", fontSize: 13, padding: 20 }}>
+            Chưa có sản phẩm vay nào trong hệ thống. Chạy{" "}
+            <code>npm run seed</code> ở backend để có dữ liệu mẫu.
+          </div>
+        )}
         {data && (
           <Line
             data={{

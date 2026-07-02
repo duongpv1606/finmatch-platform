@@ -18,7 +18,14 @@ export class ProductsService {
   }
 
   async findOne(id: string) {
-    const product = await this.repo.findOne({ where: { id } });
+    let product: Product | null;
+    try {
+      product = await this.repo.findOne({ where: { id } });
+    } catch {
+      // Invalid UUID format reaches Postgres as a query error — treat it
+      // the same as "not found" rather than leaking a raw 500.
+      throw new NotFoundException('Không tìm thấy sản phẩm');
+    }
     if (!product) throw new NotFoundException('Không tìm thấy sản phẩm');
     return product;
   }
