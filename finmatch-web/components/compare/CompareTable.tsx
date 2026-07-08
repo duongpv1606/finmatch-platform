@@ -154,7 +154,7 @@ export function CompareTable() {
                     {(p.minAmount / 1e6).toLocaleString("vi-VN")}–
                     {(p.maxAmount / 1e6).toLocaleString("vi-VN")} triệu
                   </td>
-                  <td>★ {p.rating.toFixed(1)}</td>
+                  <td>★ {Number(p.rating).toFixed(1)}</td>
                   <td style={{ color: "var(--gray-400)", fontSize: 12 }}>
                     {new Date(p.updatedAt).toLocaleDateString("vi-VN")}
                   </td>
