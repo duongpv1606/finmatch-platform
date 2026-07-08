@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Get } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Get, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import type { JwtPayload } from './auth.service';
@@ -17,6 +17,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto);
   }

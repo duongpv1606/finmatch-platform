@@ -4,10 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_SECTIONS, isNavItemVisible } from "@/constants/nav";
 import { useAppStore } from "@/store/useAppStore";
+import * as authService from "@/services/authService";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { role, user } = useAppStore();
+  const { role, user, openAuthModal, logoutLocal } = useAppStore();
+
+  async function handleLogout() {
+    await authService.logout();
+    logoutLocal();
+  }
 
   return (
     <aside className="sidebar" id="sidebar">
@@ -56,6 +62,7 @@ export function Sidebar() {
         {!user ? (
           <div id="sidebarGuest">
             <button
+              onClick={() => openAuthModal("login")}
               style={{
                 width: "100%",
                 background: "linear-gradient(135deg,var(--blue),#1D4ED8)",
@@ -75,6 +82,7 @@ export function Sidebar() {
               Đăng nhập
             </button>
             <button
+              onClick={() => openAuthModal("register")}
               style={{
                 width: "100%",
                 background: "rgba(255,255,255,.08)",
@@ -99,6 +107,20 @@ export function Sidebar() {
               </div>
               <div className="user-plan">{role}</div>
             </div>
+            <button
+              onClick={handleLogout}
+              title="Đăng xuất"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "rgba(255,255,255,.5)",
+                cursor: "pointer",
+                fontSize: 15,
+                padding: 4,
+              }}
+            >
+              <i className="ti ti-logout" />
+            </button>
           </div>
         )}
       </div>
