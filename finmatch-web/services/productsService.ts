@@ -194,7 +194,7 @@ export async function createProduct(input: CreateProductInput): Promise<Financia
 
 export async function updateProduct(
   id: string,
-  input: Partial<Pick<CreateProductInput, "interestRate" | "tags" | "sourceUrl">>
+  input: Partial<Pick<CreateProductInput, "bankName" | "name" | "interestRate" | "minAmount" | "maxAmount" | "tags" | "sourceUrl">>
 ): Promise<FinancialProduct> {
   if (USE_MOCK) {
     return mockDelay({ ...MOCK_PRODUCTS[0], ...input, id } as FinancialProduct);

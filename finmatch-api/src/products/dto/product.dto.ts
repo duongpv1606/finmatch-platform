@@ -53,10 +53,36 @@ export class CreateProductDto {
 
 export class UpdateProductDto {
   @IsOptional()
+  @IsString()
+  bankName?: string;
+
+  @IsOptional()
+  @IsUrl()
+  bankLogoUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   interestRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minAmount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxAmount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  termMonths?: number;
 
   @IsOptional()
   @IsArray()

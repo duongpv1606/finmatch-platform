@@ -47,7 +47,15 @@ export function AdminProductForm({
         .filter(Boolean);
 
       if (editing) {
-        await updateProduct(editing.id, { interestRate, tags: tagList, sourceUrl: sourceUrl || undefined });
+        await updateProduct(editing.id, {
+          bankName,
+          name,
+          interestRate,
+          minAmount: Math.round(minAmount * 1e6),
+          maxAmount: Math.round(maxAmount * 1e6),
+          tags: tagList,
+          sourceUrl: sourceUrl || undefined,
+        });
       } else {
         const input: CreateProductInput = {
           category,
@@ -94,7 +102,6 @@ export function AdminProductForm({
           <input
             className="calc-input"
             value={bankName}
-            disabled={!!editing}
             onChange={(e) => setBankName(e.target.value)}
             placeholder="Vietcombank"
           />
@@ -104,7 +111,6 @@ export function AdminProductForm({
           <input
             className="calc-input"
             value={name}
-            disabled={!!editing}
             onChange={(e) => setName(e.target.value)}
             placeholder="Vay mua nhà lãi suất ưu đãi"
           />
@@ -126,7 +132,6 @@ export function AdminProductForm({
             className="calc-input"
             type="number"
             value={minAmount}
-            disabled={!!editing}
             onChange={(e) => setMinAmount(+e.target.value)}
           />
         </div>
@@ -136,7 +141,6 @@ export function AdminProductForm({
             className="calc-input"
             type="number"
             value={maxAmount}
-            disabled={!!editing}
             onChange={(e) => setMaxAmount(+e.target.value)}
           />
         </div>

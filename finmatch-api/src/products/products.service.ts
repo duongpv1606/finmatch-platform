@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product, ProductCategory } from './product.entity';
@@ -74,7 +74,14 @@ export class ProductsService {
   }
 
   async update(id: string, dto: UpdateProductDto) {
-    await this.findOne(id);
+    const existing = await this.findOne(id);
+
+    const nextMin = dto.minAmount ?? Number(existing.minAmount);
+    const nextMax = dto.maxAmount ?? Number(existing.maxAmount);
+    if (nextMin > nextMax) {
+      throw new BadRequestException('Hạn mức tối thiểu không được lớn hơn hạn mức tối đa');
+    }
+
     await this.repo.update(id, { ...dto, updatedBy: 'cms' });
     return this.findOne(id);
   }
