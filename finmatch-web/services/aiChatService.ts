@@ -26,6 +26,27 @@ const MOCK_REPLY =
   "- **Bước tiếp theo**: cung cấp thêm lịch sử tín dụng để AI chấm điểm chính xác hơn\n\n" +
   "_Đây là phản hồi mẫu — kết nối OpenAI/Claude/Gemini ở backend để có tư vấn thật._";
 
+export interface ExtractedProfile {
+  income: number | null;
+  savings: number | null;
+  debt: number | null;
+  goal: string | null;
+}
+
+export async function extractProfile(messages: ChatMessage[]): Promise<ExtractedProfile> {
+  if (USE_MOCK) {
+    return { income: null, savings: null, debt: null, goal: null };
+  }
+  const res = await fetch(`${API_BASE_URL}/ai/extract-profile`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+    }),
+  });
+  if (!res.ok) return { income: null, savings: null, debt: null, goal: null };
+  return res.json();
+}
 export async function* streamChat(
   messages: ChatMessage[],
   sessionId: string

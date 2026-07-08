@@ -91,4 +91,44 @@ export class AiService {
     }
     return full;
   }
+
+  /** Extracts a lightweight financial profile (income/savings/debt/goal)
+   * from the conversation so far — mirrors the original HTML's regex-based
+   * extractNumber()/detectGoal() functions, but using the LLM so it
+   * understands natural phrasing ("lương 20 triệu", "khoảng 500tr tiết
+   * kiệm"...) instead of a few hardcoded patterns. Returns null fields when
+   * not yet mentioned — never guesses. */
+  async extractProfile(messages: ChatTurn[]): Promise<{
+    income: number | null;
+    savings: number | null;
+    debt: number | null;
+    goal: string | null;
+  }> {
+    const conversation = messages
+      .map((m) => `${m.role === 'user' ? 'Khách' : 'AI'}: ${m.content}`)
+      .join('\n');
+    const prompt =
+      `Đọc đoạn hội thoại sau và trích ra CHÍNH XÁC các thông tin tài chính ` +
+      `nếu khách hàng đã đề cập (đơn vị: triệu VNĐ). Nếu chưa đề cập, để null. ` +
+      `KHÔNG suy đoán hay bịa số liệu.\n\n${conversation}\n\n` +
+      `Trả lời CHỈ bằng JSON đúng định dạng: ` +
+      `{"income": số hoặc null, "savings": số hoặc null, "debt": số hoặc null, "goal": "chuỗi mô tả mục tiêu hoặc null"}`;
+
+    try {
+      const raw = await this.complete(
+        prompt,
+        'Bạn trả lời CHỈ bằng JSON hợp lệ, không markdown, không giải thích thêm.',
+      );
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+      return {
+        income: typeof parsed.income === 'number' ? parsed.income : null,
+        savings: typeof parsed.savings === 'number' ? parsed.savings : null,
+        debt: typeof parsed.debt === 'number' ? parsed.debt : null,
+        goal: typeof parsed.goal === 'string' ? parsed.goal : null,
+      };
+    } catch {
+      return { income: null, savings: null, debt: null, goal: null };
+    }
+  }
 }

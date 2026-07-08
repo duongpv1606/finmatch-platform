@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AiService } from './ai.service';
 import { ChatRequestDto } from './dto/chat-request.dto';
+import { ExtractProfileDto } from './dto/extract-profile.dto';
 import { ChatMessageEntity } from './chat-message.entity';
 
 @ApiTags('ai')
@@ -76,5 +77,10 @@ export class AiController {
       where: { sessionId },
       order: { createdAt: 'ASC' },
     });
+  }
+
+  @Post('extract-profile')
+  extractProfile(@Body() dto: ExtractProfileDto) {
+    return this.ai.extractProfile(dto.messages);
   }
 }
