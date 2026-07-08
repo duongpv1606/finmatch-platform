@@ -57,13 +57,14 @@ async function authFetch(path: string, body: unknown): Promise<AuthResult> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.message ?? `Lỗi ${res.status}`);
+    const message = Array.isArray(err.message) ? err.message.join(", ") : err.message;
+    throw new Error(message ?? `Lỗi ${res.status}`);
   }
   return res.json();
 }
 
 export async function login(email: string, password: string): Promise<AuthResult> {
-  if (USE_MOCK) return mockAuth(email, "Người dùng demo", "customer");
+  if (USE_MOCK) return mockAuth(email, "0900000000", "Người dùng demo", "customer");
   const result = await authFetch("/auth/login", { email, password });
   saveSession(result);
   return result;
@@ -72,27 +73,14 @@ export async function login(email: string, password: string): Promise<AuthResult
 export async function register(
   name: string,
   email: string,
+  phone: string,
   password: string,
   role: UserRole = "customer"
 ): Promise<AuthResult> {
-  if (USE_MOCK) return mockAuth(email, name, role);
-  const result = await authFetch("/auth/register", { name, email, password, role });
+  if (USE_MOCK) return mockAuth(email, phone, name, role);
+  const result = await authFetch("/auth/register", { name, email, phone, password, role });
   saveSession(result);
   return result;
-}
-
-/** Demo quick-login: tries to log in with a fixed demo account for the given
- * role; if it doesn't exist yet on this backend, registers it first. Lets
- * the "Demo nhanh" buttons in the auth modal work without manual seeding. */
-export async function quickLogin(role: "customer" | "sale"): Promise<AuthResult> {
-  const email = `demo-${role}@finmatch.vn`;
-  const password = "Demo@12345";
-  const name = role === "sale" ? "Sale Demo" : "Khách hàng Demo";
-  try {
-    return await login(email, password);
-  } catch {
-    return await register(name, email, password, role);
-  }
 }
 
 export async function logout() {
@@ -108,11 +96,11 @@ export async function logout() {
   }
 }
 
-function mockAuth(email: string, name: string, role: UserRole): AuthResult {
+function mockAuth(email: string, phone: string, name: string, role: UserRole): AuthResult {
   const result: AuthResult = {
     accessToken: "mock-token",
     refreshToken: "mock-refresh",
-    user: { id: "mock-user", email, name, role, createdAt: new Date().toISOString() },
+    user: { id: "mock-user", email, phone, name, role, createdAt: new Date().toISOString() },
   };
   saveSession(result);
   return result;

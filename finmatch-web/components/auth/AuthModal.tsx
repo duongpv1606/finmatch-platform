@@ -5,6 +5,8 @@ import { useAppStore } from "@/store/useAppStore";
 import * as authService from "@/services/authService";
 import { UserRole } from "@/types";
 
+const PHONE_REGEX = /^0\d{9}$/;
+
 export function AuthModal() {
   const { authModalOpen, authView, closeAuthModal, switchAuthView, setSession } =
     useAppStore();
@@ -22,20 +24,8 @@ export function AuthModal() {
   );
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
+  const [regPhone, setRegPhone] = useState("");
   const [regPass, setRegPass] = useState("");
-
-  async function handleQuickLogin(role: "customer" | "sale") {
-    setError(null);
-    setLoading(true);
-    try {
-      const result = await authService.quickLogin(role);
-      setSession(result.user);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleLogin() {
     setError(null);
@@ -60,9 +50,13 @@ export function AuthModal() {
       setError("Điền đủ thông tin — mật khẩu tối thiểu 6 ký tự");
       return;
     }
+    if (!PHONE_REGEX.test(regPhone)) {
+      setError("Số điện thoại không hợp lệ (định dạng: 0xxxxxxxxx)");
+      return;
+    }
     setLoading(true);
     try {
-      const result = await authService.register(regName, regEmail, regPass, regRole);
+      const result = await authService.register(regName, regEmail, regPhone, regPass, regRole);
       setSession(result.user);
     } catch (e) {
       setError((e as Error).message);
@@ -90,82 +84,6 @@ export function AuthModal() {
               Chào mừng quay lại — tiếp tục hành trình tài chính của bạn
             </div>
 
-            <div
-              style={{
-                background: "var(--gray-50)",
-                border: "1px solid var(--gray-200)",
-                borderRadius: 12,
-                padding: "12px 14px",
-                marginBottom: 18,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "var(--gray-400)",
-                  textTransform: "uppercase",
-                  letterSpacing: ".06em",
-                  marginBottom: 9,
-                }}
-              >
-                Demo nhanh — Click để đăng nhập
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <div
-                  onClick={() => handleQuickLogin("customer")}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "9px 12px",
-                    border: "1.5px solid var(--gray-200)",
-                    borderRadius: 9,
-                    cursor: "pointer",
-                    background: "white",
-                  }}
-                >
-                  <i className="ti ti-user" style={{ fontSize: 16, color: "var(--emerald)" }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--navy)" }}>
-                      Khách hàng
-                    </div>
-                    <div style={{ fontSize: 11, color: "var(--gray-400)" }}>
-                      Xem sản phẩm, nhận tư vấn AI
-                    </div>
-                  </div>
-                  <span className="role-badge role-badge-customer">Khách hàng</span>
-                </div>
-                <div
-                  onClick={() => handleQuickLogin("sale")}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "9px 12px",
-                    border: "1.5px solid var(--gray-200)",
-                    borderRadius: 9,
-                    cursor: "pointer",
-                    background: "white",
-                  }}
-                >
-                  <i className="ti ti-chart-bar" style={{ fontSize: 16, color: "var(--blue)" }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--navy)" }}>
-                      Sale
-                    </div>
-                    <div style={{ fontSize: 11, color: "var(--gray-400)" }}>
-                      Mua lead, xem dashboard, viết content AI
-                    </div>
-                  </div>
-                  <span className="role-badge role-badge-sale">Sale</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="auth-divider">
-              <span>hoặc đăng nhập bằng tài khoản</span>
-            </div>
             <div className="auth-field">
               <label>Email</label>
               <input
@@ -186,7 +104,7 @@ export function AuthModal() {
               />
             </div>
             {error && (
-              <div style={{ color: "var(--red, #DC2626)", fontSize: 12, marginBottom: 10 }}>
+              <div style={{ color: "#DC2626", fontSize: 12, marginBottom: 10 }}>
                 {error}
               </div>
             )}
@@ -239,6 +157,16 @@ export function AuthModal() {
               />
             </div>
             <div className="auth-field">
+              <label>Số điện thoại</label>
+              <input
+                type="tel"
+                placeholder="0912345678"
+                value={regPhone}
+                onChange={(e) => setRegPhone(e.target.value.replace(/[^\d]/g, ""))}
+                maxLength={10}
+              />
+            </div>
+            <div className="auth-field">
               <label>Mật khẩu</label>
               <input
                 type="password"
@@ -249,7 +177,7 @@ export function AuthModal() {
               />
             </div>
             {error && (
-              <div style={{ color: "var(--red, #DC2626)", fontSize: 12, marginBottom: 10 }}>
+              <div style={{ color: "#DC2626", fontSize: 12, marginBottom: 10 }}>
                 {error}
               </div>
             )}

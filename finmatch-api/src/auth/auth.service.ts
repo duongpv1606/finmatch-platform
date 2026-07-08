@@ -60,6 +60,7 @@ export class AuthService {
       email: dto.email,
       passwordHash,
       name: dto.name,
+      phone: dto.phone,
       role: this.resolvePublicRole(dto.email, dto.role),
     });
     return this.issueTokens(user);
@@ -120,6 +121,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
         role: user.role,
       },
     };
