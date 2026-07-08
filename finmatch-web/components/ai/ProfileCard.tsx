@@ -1,15 +1,15 @@
-import { ExtractedProfile } from "@/services/aiChatService";
+import { LeadProfile } from "@/lib/chatFlow";
 
 function fmt(n: number | null): string {
   if (n === null) return "Chưa rõ";
   return `${n.toLocaleString("vi-VN")} triệu`;
 }
 
-export function ProfileCard({ profile }: { profile: ExtractedProfile }) {
+export function ProfileCard({ profile }: { profile: LeadProfile }) {
   const fields = [
     { label: "Thu nhập hàng tháng", val: fmt(profile.income), icon: "ti-wallet" },
     { label: "Tiết kiệm", val: fmt(profile.savings), icon: "ti-coins" },
-    { label: "Nợ hiện tại", val: profile.debt === null ? "Chưa rõ" : fmt(profile.debt), icon: "ti-cash" },
+    { label: "Nợ hiện tại", val: fmt(profile.debt), icon: "ti-cash" },
     { label: "Mục tiêu", val: profile.goal ?? "Chưa rõ", icon: "ti-target-arrow" },
   ];
 
@@ -37,9 +37,6 @@ export function ProfileCard({ profile }: { profile: ExtractedProfile }) {
           </div>
         ))}
       </div>
-      <p style={{ fontSize: 11, color: "var(--gray-400)", marginTop: 10 }}>
-        Tự động cập nhật khi bạn trò chuyện với AI — chưa lưu gì sẽ tự hiện khi bạn nhắc đến.
-      </p>
     </div>
   );
 }

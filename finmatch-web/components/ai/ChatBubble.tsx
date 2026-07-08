@@ -36,6 +36,17 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
             <span dangerouslySetInnerHTML={{ __html: formatText(message.content) }} />
           )}
         </div>
+        {message.result && (
+          <div className="ai-result-card">
+            <div className="ai-result-title">{message.result.title}</div>
+            {message.result.rows.map((r) => (
+              <div className="ai-res-row" key={r[0]}>
+                <span className="ai-res-label">{r[0]}</span>
+                <span className={`ai-res-val${r[2] === "good" ? " good" : ""}`}>{r[1]}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

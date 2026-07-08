@@ -77,12 +77,18 @@ export interface NewsArticle {
   publishedAt: string;
 }
 
+export interface ChatResultCard {
+  title: string;
+  rows: [string, string, "good" | null][]; // [label, value, style]
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   createdAt: string;
   streaming?: boolean;
+  result?: ChatResultCard;
 }
 
 export interface AIRecommendationInput {

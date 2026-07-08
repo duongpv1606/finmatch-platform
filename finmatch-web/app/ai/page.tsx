@@ -24,7 +24,7 @@ function AIPageInner() {
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <SuggestedQuestions onPick={send} />
             <ProfileCard profile={profile} />
-            <AutoRecommendation profile={profile} messageCount={messages.length} />
+            <AutoRecommendation profile={profile} />
           </div>
         </div>
       </div>

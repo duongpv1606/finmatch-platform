@@ -2,17 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChatMessage } from "@/types";
-import { streamChat, extractProfile, ExtractedProfile } from "@/services/aiChatService";
+import { streamChat } from "@/services/aiChatService";
+import {
+  ConvState,
+  LeadProfile,
+  initialLeadProfile,
+  runChatFlow,
+} from "@/lib/chatFlow";
 
 export function useChatSession(initialQuery?: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sending, setSending] = useState(false);
-  const [profile, setProfile] = useState<ExtractedProfile>({
-    income: null,
-    savings: null,
-    debt: null,
-    goal: null,
-  });
+  const [profile, setProfile] = useState<LeadProfile>(initialLeadProfile);
+  const stateRef = useRef<ConvState>("init");
   const sessionIdRef = useRef<string>(crypto.randomUUID());
   const startedRef = useRef(false);
 
@@ -24,46 +26,86 @@ export function useChatSession(initialQuery?: string) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery]);
 
+  function pushMessage(m: ChatMessage) {
+    setMessages((prev) => [...prev, m]);
+  }
+
   async function send(text: string) {
     if (!text.trim() || sending) return;
     setSending(true);
+
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
       role: "user",
       content: text,
       createdAt: new Date().toISOString(),
     };
-    const aiMsgId = crypto.randomUUID();
-    const aiMsg: ChatMessage = {
-      id: aiMsgId,
+    pushMessage(userMsg);
+
+    const typingId = crypto.randomUUID();
+    pushMessage({
+      id: typingId,
       role: "assistant",
       content: "",
       createdAt: new Date().toISOString(),
       streaming: true,
-    };
-
-    let history: ChatMessage[] = [];
-    setMessages((prev) => {
-      history = [...prev, userMsg];
-      return [...prev, userMsg, aiMsg];
     });
 
-    let acc = "";
-    for await (const chunk of streamChat(history, sessionIdRef.current)) {
-      acc += chunk;
-      setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, content: acc } : m)));
+    // Same "thinking" delay as the original (600-1200ms) before revealing
+    // the reply — makes the scripted flow feel conversational, not instant.
+    await new Promise((r) => setTimeout(r, 600 + Math.random() * 600));
+
+    if (stateRef.current === "done") {
+      // Lead already captured — hand off to the real AI backend (grounded
+      // in real DB products) for open-ended follow-up questions, instead
+      // of the original's few hardcoded keyword replies.
+      setMessages((prev) => prev.filter((m) => m.id !== typingId));
+      const aiMsgId = crypto.randomUUID();
+      pushMessage({
+        id: aiMsgId,
+        role: "assistant",
+        content: "",
+        createdAt: new Date().toISOString(),
+        streaming: true,
+      });
+      let acc = "";
+      const history = [...messages, userMsg];
+      try {
+        for await (const chunk of streamChat(history, sessionIdRef.current)) {
+          acc += chunk;
+          setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, content: acc } : m)));
+        }
+      } catch (e) {
+        acc = (e as Error).message;
+      }
+      setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, content: acc, streaming: false } : m)));
+      setSending(false);
+      return;
     }
-    const finalMessages = [...history, { ...aiMsg, content: acc, streaming: false }];
-    setMessages((prev) => prev.map((m) => (m.id === aiMsgId ? { ...m, streaming: false } : m)));
+
+    const flow = runChatFlow(stateRef.current, profile, text);
+    stateRef.current = flow.nextState;
+    setProfile(flow.profile);
+
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === typingId
+          ? { ...m, content: flow.text, streaming: false, result: flow.result }
+          : m
+      )
+    );
     setSending(false);
 
-    // Once there's been at least one full exchange, try to extract a
-    // financial profile from the conversation — mirrors the original
-    // HTML's behavior of showing the recommendation card once enough
-    // context exists (chatHistory.length > 2).
-    if (finalMessages.length > 2) {
-      const extracted = await extractProfile(finalMessages);
-      setProfile(extracted);
+    if (flow.delayedFollowUp) {
+      setTimeout(() => {
+        stateRef.current = "ask_name";
+        pushMessage({
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: flow.delayedFollowUp!,
+          createdAt: new Date().toISOString(),
+        });
+      }, 2000);
     }
   }
 

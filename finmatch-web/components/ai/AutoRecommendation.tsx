@@ -1,36 +1,39 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ExtractedProfile } from "@/services/aiChatService";
+import { LeadProfile } from "@/lib/chatFlow";
 import { getRecommendation } from "@/services/recommendationService";
 import { RecommendationResponse } from "@/types";
 import { AIMatchingSteps } from "./AIMatchingSteps";
 import { AIRecommendationCard } from "./AIRecommendationCard";
 
-export function AutoRecommendation({
-  profile,
-  messageCount,
-}: {
-  profile: ExtractedProfile;
-  messageCount: number;
-}) {
+export function AutoRecommendation({ profile }: { profile: LeadProfile }) {
   const [stage, setStage] = useState<"idle" | "matching" | "result">("idle");
   const [result, setResult] = useState<RecommendationResponse | null>(null);
+  const hasShownOnceRef = useRef(false);
   const lastKeyRef = useRef<string>("");
 
   useEffect(() => {
-    // Original HTML showed the card once chatHistory.length > 2 AND income
-    // was known. We mirror that threshold here.
-    if (messageCount <= 2 || profile.income === null) return;
+    // Mirrors the original: the sidebar card appears as soon as income is
+    // known (`if (leadProfile.income) { ...renderAIRecoCard(true) }`).
+    if (profile.income === null) return;
 
     const key = `${profile.income}-${profile.savings}-${profile.debt}-${profile.goal}`;
-    if (key === lastKeyRef.current) return; // profile hasn't changed, don't refetch
+    if (key === lastKeyRef.current) return;
     lastKeyRef.current = key;
 
-    setStage("matching");
-  }, [profile, messageCount]);
+    if (!hasShownOnceRef.current) {
+      hasShownOnceRef.current = true;
+      setStage("matching");
+    } else {
+      // Profile updated after the first reveal (e.g. savings/debt just
+      // answered) — refresh data quietly instead of replaying the full
+      // "AI is thinking" animation every single message.
+      void fetchAndShow();
+    }
+  }, [profile]);
 
-  async function handleMatchingComplete() {
+  async function fetchAndShow() {
     const income = profile.income ?? 20;
     const savings = profile.savings ?? 0;
     const debt = profile.debt ?? 0;
@@ -60,7 +63,7 @@ export function AutoRecommendation({
   if (stage === "matching") {
     return (
       <div className="card" style={{ background: "var(--navy)", borderRadius: 18 }}>
-        <AIMatchingSteps onComplete={handleMatchingComplete} />
+        <AIMatchingSteps onComplete={fetchAndShow} />
       </div>
     );
   }
