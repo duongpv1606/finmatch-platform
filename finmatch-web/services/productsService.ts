@@ -119,6 +119,42 @@ export async function getRateHistory(
   );
 }
 
+export interface ProductSearchParams {
+  category?: ProductCategory;
+  q?: string;
+  sortBy?: "interestRate" | "rating" | "bankName" | "name" | "updatedAt";
+  sortOrder?: "ASC" | "DESC";
+  page?: number;
+  limit?: number;
+}
+
+export interface ProductSearchResult {
+  items: FinancialProduct[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export async function searchProducts(params: ProductSearchParams): Promise<ProductSearchResult> {
+  if (USE_MOCK) {
+    let items = params.category ? MOCK_PRODUCTS.filter((p) => p.category === params.category) : MOCK_PRODUCTS;
+    if (params.q) {
+      const q = params.q.toLowerCase();
+      items = items.filter((p) => p.name.toLowerCase().includes(q) || p.bankName.toLowerCase().includes(q));
+    }
+    return mockDelay({ items, total: items.length, page: 1, limit: 10, totalPages: 1 });
+  }
+  const qs = new URLSearchParams();
+  if (params.category) qs.set("category", params.category);
+  if (params.q) qs.set("q", params.q);
+  if (params.sortBy) qs.set("sortBy", params.sortBy);
+  if (params.sortOrder) qs.set("sortOrder", params.sortOrder);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.limit) qs.set("limit", String(params.limit));
+  return apiFetch<ProductSearchResult>(`/products/search?${qs.toString()}`);
+}
+
 // ── Admin-only writes (require admin/super_admin/bank role — enforced by
 // the backend's RolesGuard, this is not just a UI-level restriction). ──
 

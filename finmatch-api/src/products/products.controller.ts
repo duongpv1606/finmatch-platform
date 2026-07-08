@@ -12,6 +12,7 @@ import {
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+import { SearchProductsDto } from './dto/search-products.dto';
 import { ProductCategory } from './product.entity';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -27,6 +28,15 @@ export class ProductsController {
   @ApiQuery({ name: 'category', required: false, enum: ProductCategory })
   findAll(@Query('category') category?: ProductCategory) {
     return this.service.findAll(category);
+  }
+
+  // Dedicated search endpoint — real DB-side search/filter/sort/pagination
+  // for the Compare page, separate from the simple findAll() above so
+  // other callers (rate chart, recommendation engine, AI grounding, admin
+  // list) keep their existing "just give me everything" behavior.
+  @Get('search')
+  search(@Query() query: SearchProductsDto) {
+    return this.service.search(query);
   }
 
   @Get(':id')

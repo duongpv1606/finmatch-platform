@@ -17,6 +17,44 @@ export class ProductsService {
     });
   }
 
+  /** Dedicated search endpoint for the Compare page — real pagination,
+   * sorting, and text search against the DB (not client-side filtering of
+   * an already-fetched full list), so this scales as the product catalog
+   * grows. Kept separate from findAll() so existing callers (rate chart,
+   * recommendation engine, AI grounding, admin list) are untouched. */
+  async search(options: {
+    category?: ProductCategory;
+    q?: string;
+    sortBy?: 'interestRate' | 'rating' | 'bankName' | 'name' | 'updatedAt';
+    sortOrder?: 'ASC' | 'DESC';
+    page?: number;
+    limit?: number;
+  }) {
+    const page = Math.max(1, options.page ?? 1);
+    const limit = Math.min(50, Math.max(1, options.limit ?? 10));
+    const sortBy = options.sortBy ?? 'interestRate';
+    const sortOrder = options.sortOrder ?? 'ASC';
+
+    const qb = this.repo.createQueryBuilder('p');
+    if (options.category) {
+      qb.andWhere('p.category = :category', { category: options.category });
+    }
+    if (options.q) {
+      qb.andWhere('(p.name ILIKE :q OR p.bankName ILIKE :q)', { q: `%${options.q}%` });
+    }
+    qb.orderBy(`p.${sortBy}`, sortOrder);
+    qb.skip((page - 1) * limit).take(limit);
+
+    const [items, total] = await qb.getManyAndCount();
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    };
+  }
+
   async findOne(id: string) {
     let product: Product | null;
     try {
