@@ -34,7 +34,7 @@ export class AiController {
     let full = '';
     let headersSent = false;
     try {
-      for await (const chunk of this.ai.streamChat(dto.messages)) {
+      for await (const chunk of await this.ai.streamChat(dto.messages)) {
         if (!headersSent) {
           res.setHeader('Content-Type', 'text/plain; charset=utf-8');
           res.setHeader('Cache-Control', 'no-cache');
