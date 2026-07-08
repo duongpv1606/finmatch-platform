@@ -27,10 +27,9 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  refresh(@CurrentUser() user: JwtPayload, @Body() dto: RefreshDto) {
-    return this.auth.refresh(user.sub, dto.refreshToken);
+  @HttpCode(200)
+  refresh(@Body() dto: RefreshDto) {
+    return this.auth.refresh(dto.refreshToken);
   }
 
   @Post('logout')

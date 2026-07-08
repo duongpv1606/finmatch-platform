@@ -49,6 +49,35 @@ export function getAccessToken(): string | null {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
+function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+/** Called automatically by apiClient.authedFetch when a request comes back
+ * 401 (access token expired — it only lives 15 minutes). Uses the
+ * long-lived refresh token to get a new access token transparently, so
+ * the person doesn't get logged out just for staying on a page a while.
+ * Returns the new access token, or null if the refresh token is also
+ * invalid/expired (caller should then treat this as a real logout). */
+export async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) return null;
+    const result: AuthResult = await res.json();
+    saveSession(result);
+    return result.accessToken;
+  } catch {
+    return null;
+  }
+}
+
 async function authFetch(path: string, body: unknown): Promise<AuthResult> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, Matches, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 import { UserRole } from '../../users/user.entity';
 
 export class RegisterDto {
@@ -32,5 +32,6 @@ export class LoginDto {
 }
 
 export class RefreshDto {
+  @IsString()
   refreshToken: string;
 }

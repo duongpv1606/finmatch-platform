@@ -85,11 +85,15 @@ export class AuthService {
     return this.issueTokens(user);
   }
 
-  async refresh(userId: string, refreshToken: string) {
-    const user = await this.users.findById(userId);
-    if (!user) throw new UnauthorizedException();
+  async refresh(refreshToken: string) {
+    let payload: JwtPayload;
+    try {
+      payload = this.jwt.verify<JwtPayload>(refreshToken);
+    } catch {
+      throw new UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn');
+    }
 
-    const stored = await this.users.findByEmail(user.email); // includes hash via query builder
+    const stored = await this.users.findByEmail(payload.email); // includes hash via query builder
     if (!stored?.refreshTokenHash) throw new UnauthorizedException();
 
     const ok = await bcrypt.compare(refreshToken, stored.refreshTokenHash);
