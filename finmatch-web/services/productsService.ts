@@ -20,7 +20,7 @@
 // ────────────────────────────────────────────────────────────
 
 import { FinancialProduct, ProductCategory, RateHistoryPoint } from "@/types";
-import { USE_MOCK, apiFetch, mockDelay } from "./apiClient";
+import { USE_MOCK, apiFetch, authedFetch, mockDelay } from "./apiClient";
 
 const MOCK_PRODUCTS: FinancialProduct[] = [
   {
@@ -117,4 +117,62 @@ export async function getRateHistory(
   return apiFetch<RateHistoryPoint[]>(
     `/products/${productId}/rate-history?months=${months}`
   );
+}
+
+// ── Admin-only writes (require admin/super_admin/bank role — enforced by
+// the backend's RolesGuard, this is not just a UI-level restriction). ──
+
+export interface CreateProductInput {
+  category: FinancialProduct["category"];
+  bankId: string;
+  bankName: string;
+  bankLogoUrl?: string;
+  name: string;
+  interestRate: number;
+  minAmount: number;
+  maxAmount: number;
+  termMonths?: number;
+  tags?: string[];
+  sourceUrl?: string;
+}
+
+export async function createProduct(input: CreateProductInput): Promise<FinancialProduct> {
+  if (USE_MOCK) {
+    const product: FinancialProduct = {
+      ...input,
+      id: crypto.randomUUID(),
+      bankLogoUrl: input.bankLogoUrl ?? "",
+      termMonths: input.termMonths ?? 0,
+      rating: 0,
+      reviewCount: 0,
+      tags: input.tags ?? [],
+      updatedAt: new Date().toISOString(),
+    };
+    return mockDelay(product);
+  }
+  return authedFetch<FinancialProduct>("/products", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function updateProduct(
+  id: string,
+  input: Partial<Pick<CreateProductInput, "interestRate" | "tags" | "sourceUrl">>
+): Promise<FinancialProduct> {
+  if (USE_MOCK) {
+    return mockDelay({ ...MOCK_PRODUCTS[0], ...input, id } as FinancialProduct);
+  }
+  return authedFetch<FinancialProduct>(`/products/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  if (USE_MOCK) {
+    await mockDelay(null);
+    return;
+  }
+  await authedFetch<void>(`/products/${id}`, { method: "DELETE" });
 }
