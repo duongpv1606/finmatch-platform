@@ -85,12 +85,32 @@ export interface ChatMessage {
 }
 
 export interface AIRecommendationInput {
-  income: number;
+  income: number; // triệu VND / tháng
+  savings: number; // triệu VND
+  debt: number; // triệu VND / tháng (existing debt repayment)
   occupation: string;
   age: number;
-  loanAmount: number;
+  loanAmount: number; // triệu VND
   creditHistory: "none" | "good" | "average" | "poor";
   goal: string;
+}
+
+export interface RecommendationMatch {
+  product: FinancialProduct;
+  score: number; // 0-100, deterministic
+  reasons: string[]; // AI-generated natural language reasons
+}
+
+export interface RecommendationResponse {
+  matchScore: number; // 0-100 — overall fit for the #1 result
+  affordability: number; // 0-100
+  debtSafety: number; // 0-100
+  approval: number; // 0-100 — estimated approval odds
+  healthGrade: "A+" | "A" | "B+" | "B" | "C+";
+  dtiPct: number;
+  maxEMI: number; // triệu VND/month
+  topMatches: RecommendationMatch[]; // ranked, best first
+  aiSummary: string; // LLM-generated natural-language explanation
 }
 
 export interface AIRecommendationResult {

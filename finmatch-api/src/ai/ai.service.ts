@@ -38,4 +38,19 @@ export class AiService {
   streamChat(messages: ChatTurn[]) {
     return this.getProvider().streamChat(messages, FINANCE_SYSTEM_PROMPT);
   }
+
+  /** Buffers a full response for one-shot generation tasks (not user-facing
+   * streaming) — e.g. generating recommendation reasoning text. Reuses the
+   * same provider abstraction, just collects all chunks before returning. */
+  async complete(prompt: string, systemPrompt: string): Promise<string> {
+    const provider = this.getProvider();
+    let full = '';
+    for await (const chunk of provider.streamChat(
+      [{ role: 'user', content: prompt }],
+      systemPrompt,
+    )) {
+      full += chunk;
+    }
+    return full;
+  }
 }

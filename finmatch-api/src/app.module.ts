@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
 import { MarketModule } from './market/market.module';
 import { AiModule } from './ai/ai.module';
+import { RecommendationModule } from './recommendation/recommendation.module';
 
 @Module({
   imports: [
@@ -23,9 +24,10 @@ import { AiModule } from './ai/ai.module';
         password: config.get('DB_PASSWORD', 'postgres'),
         database: config.get('DB_NAME', 'finmatch'),
         autoLoadEntities: true,
-        // synchronize=true is fine for early-stage dev; switch to migrations
-        // (typeorm migration:generate) before production.
-        synchronize: config.get('NODE_ENV') !== 'production',
+        // Forced true — see Railway deploy notes: NODE_ENV wasn't reliably
+        // absent on the host, which skipped table creation. Switch to real
+        // migrations before this app has production data worth protecting.
+        synchronize: true,
       }),
     }),
     UsersModule,
@@ -33,6 +35,7 @@ import { AiModule } from './ai/ai.module';
     ProductsModule,
     MarketModule,
     AiModule,
+    RecommendationModule,
   ],
 })
 export class AppModule {}
