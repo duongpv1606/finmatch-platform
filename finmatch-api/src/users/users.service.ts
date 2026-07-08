@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User, UserRole } from './user.entity';
 
 @Injectable()
 export class UsersService {
@@ -29,5 +29,9 @@ export class UsersService {
 
   async setRefreshTokenHash(userId: string, hash: string | null) {
     await this.repo.update(userId, { refreshTokenHash: hash ?? undefined });
+  }
+
+  async updateRole(userId: string, role: UserRole) {
+    await this.repo.update(userId, { role });
   }
 }

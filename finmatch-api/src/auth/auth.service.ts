@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -20,7 +21,35 @@ export class AuthService {
   constructor(
     private readonly users: UsersService,
     private readonly jwt: JwtService,
+    private readonly config: ConfigService,
   ) {}
+
+  /**
+   * Only these emails (configurable via ADMIN_EMAILS, comma-separated) may
+   * ever hold the admin role. Public registration NEVER grants admin/
+   * super_admin/bank directly — even if the client sends role: "admin" in
+   * the request body, it's ignored unless the email is on this list. This
+   * closes a real hole: RegisterDto previously let anyone self-assign any
+   * role.
+   */
+  private isDesignatedAdmin(email: string): boolean {
+    const list = (
+      this.config.get<string>('ADMIN_EMAILS') ?? 'duongpv1606@gmail.com'
+    )
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    return list.includes(email.toLowerCase());
+  }
+
+  private resolvePublicRole(email: string, requested?: UserRole): UserRole {
+    if (this.isDesignatedAdmin(email)) return UserRole.ADMIN;
+    // Self-registration can only ever become customer or sale — bank/
+    // admin/super_admin must be granted manually, never chosen by the
+    // person signing up.
+    if (requested === UserRole.SALE) return UserRole.SALE;
+    return UserRole.CUSTOMER;
+  }
 
   async register(dto: RegisterDto) {
     const existing = await this.users.findByEmail(dto.email);
@@ -31,7 +60,7 @@ export class AuthService {
       email: dto.email,
       passwordHash,
       name: dto.name,
-      role: dto.role ?? UserRole.CUSTOMER,
+      role: this.resolvePublicRole(dto.email, dto.role),
     });
     return this.issueTokens(user);
   }
@@ -42,6 +71,15 @@ export class AuthService {
 
     const ok = await bcrypt.compare(dto.password, user.passwordHash);
     if (!ok) throw new UnauthorizedException('Sai email hoặc mật khẩu');
+
+    // Auto-promote: if this email is on the designated-admin list but the
+    // existing account (created before this rule, or by any other means)
+    // isn't admin yet, upgrade it now. Keeps the "one true admin email"
+    // rule enforced even for accounts that already existed.
+    if (this.isDesignatedAdmin(user.email) && user.role !== UserRole.ADMIN) {
+      await this.users.updateRole(user.id, UserRole.ADMIN);
+      user.role = UserRole.ADMIN;
+    }
 
     return this.issueTokens(user);
   }
