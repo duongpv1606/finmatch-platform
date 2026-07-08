@@ -22,6 +22,10 @@ export class UsersService {
     return this.repo.findOne({ where: { id } });
   }
 
+  findAll() {
+    return this.repo.find({ order: { createdAt: 'DESC' } });
+  }
+
   create(data: Partial<User>) {
     const user = this.repo.create(data);
     return this.repo.save(user);

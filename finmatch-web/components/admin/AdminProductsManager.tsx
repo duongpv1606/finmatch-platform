@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAppStore } from "@/store/useAppStore";
 import { getProducts, deleteProduct } from "@/services/productsService";
 import { FinancialProduct } from "@/types";
 import { AdminProductForm } from "./AdminProductForm";
 
 export function AdminProductsManager() {
-  const { user, role, openAuthModal } = useAppStore();
   const queryClient = useQueryClient();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<FinancialProduct | null>(null);
@@ -16,43 +14,7 @@ export function AdminProductsManager() {
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => getProducts(),
-    enabled: role === "admin" || role === "super_admin",
   });
-
-  if (!user) {
-    return (
-      <div className="access-denied">
-        <div className="access-denied-icon">⚡</div>
-        <h3>Chỉ dành cho Admin / Chủ sở hữu</h3>
-        <p>Khu vực này được bảo vệ. Chỉ Admin mới có toàn quyền truy cập dashboard quản trị.</p>
-        <button
-          onClick={() => openAuthModal("login")}
-          style={{
-            background: "var(--navy)",
-            color: "white",
-            border: "none",
-            borderRadius: 10,
-            padding: "11px 24px",
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-        >
-          Đăng nhập Admin →
-        </button>
-      </div>
-    );
-  }
-
-  if (role !== "admin" && role !== "super_admin") {
-    return (
-      <div className="access-denied">
-        <div className="access-denied-icon">⚡</div>
-        <h3>Không đủ quyền truy cập</h3>
-        <p>Tài khoản {user.email} hiện có quyền &quot;{role}&quot; — khu vực này chỉ dành cho Admin.</p>
-      </div>
-    );
-  }
 
   async function handleDelete(product: FinancialProduct) {
     if (!confirm(`Xoá sản phẩm "${product.name}"?`)) return;
@@ -70,15 +32,7 @@ export function AdminProductsManager() {
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-            <span className="sec-eyebrow" style={{ color: "var(--red)", marginBottom: 0 }}>
-              ⚡ Admin Portal
-            </span>
-            <span className="role-badge role-badge-admin">Toàn quyền</span>
-          </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--navy)", marginBottom: 4, letterSpacing: "-.4px" }}>
-            Quản lý sản phẩm
-          </h2>
+          <h3 style={{ marginBottom: 4 }}>Quản lý sản phẩm</h3>
           <p className="text-sm text-muted">Thêm, sửa, xoá sản phẩm tài chính — dữ liệu thật, cập nhật ngay lập tức.</p>
         </div>
         {!formOpen && (
