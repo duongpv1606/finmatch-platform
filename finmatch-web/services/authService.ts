@@ -63,6 +63,17 @@ async function authFetch(path: string, body: unknown): Promise<AuthResult> {
   return res.json();
 }
 
+export async function getMyProfile(): Promise<(User & { credits: number }) | null> {
+  if (USE_MOCK) return null;
+  const token = getAccessToken();
+  if (!token) return null;
+  const res = await fetch(`${API_BASE_URL}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export async function login(email: string, password: string): Promise<AuthResult> {
   if (USE_MOCK) return mockAuth(email, "0900000000", "Người dùng demo", "customer");
   const result = await authFetch("/auth/login", { email, password });

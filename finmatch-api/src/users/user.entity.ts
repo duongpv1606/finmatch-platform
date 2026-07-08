@@ -41,6 +41,12 @@ export class User {
   @Column({ nullable: true, select: false })
   refreshTokenHash?: string;
 
+  // Demo "wallet" for the lead marketplace — buying a lead deducts credits.
+  // Real money (Stripe/VNPay/Momo) is a separate, later phase; this lets
+  // the marketplace mechanic be fully testable today.
+  @Column({ type: 'int', default: 100 })
+  credits: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

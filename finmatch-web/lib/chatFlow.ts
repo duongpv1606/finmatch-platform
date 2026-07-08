@@ -90,6 +90,13 @@ export function calcAnalysis(profile: LeadProfile): AnalysisFacts {
   return { maxEMI, loanCap, dtiPct, approval };
 }
 
+export function goalToCategory(goal: string | null): "loan" | "card" | "insurance" | "invest" | "savings" {
+  if (goal === "Đầu tư") return "invest";
+  if (goal === "Tiết kiệm") return "savings";
+  if (goal === "Bảo hiểm") return "insurance";
+  return "loan"; // Mua nhà, Mua xe, Vay cá nhân, and default
+}
+
 export interface FlowResult {
   nextState: ConvState;
   profile: LeadProfile;

@@ -38,4 +38,17 @@ export class UsersService {
   async updateRole(userId: string, role: UserRole) {
     await this.repo.update(userId, { role });
   }
+
+  async deductCredits(userId: string, amount: number): Promise<boolean> {
+    // Atomic conditional update — only deducts if enough balance, avoids a
+    // race where two purchases both read "enough credits" before either
+    // writes back.
+    const result = await this.repo
+      .createQueryBuilder()
+      .update(User)
+      .set({ credits: () => `credits - ${amount}` })
+      .where('id = :userId AND credits >= :amount', { userId, amount })
+      .execute();
+    return (result.affected ?? 0) > 0;
+  }
 }

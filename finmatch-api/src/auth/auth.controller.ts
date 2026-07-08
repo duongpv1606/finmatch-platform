@@ -5,11 +5,15 @@ import type { JwtPayload } from './auth.service';
 import { LoginDto, RefreshDto, RegisterDto } from './dto/auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { UsersService } from '../users/users.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly users: UsersService,
+  ) {}
 
   @Post('register')
   register(@Body() dto: RegisterDto) {
@@ -39,7 +43,17 @@ export class AuthController {
   @Get('me')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  me(@CurrentUser() user: JwtPayload) {
-    return user;
+  async me(@CurrentUser() user: JwtPayload) {
+    const full = await this.users.findById(user.sub);
+    if (!full) return user;
+    return {
+      id: full.id,
+      email: full.email,
+      name: full.name,
+      phone: full.phone,
+      role: full.role,
+      credits: full.credits,
+      createdAt: full.createdAt,
+    };
   }
 }

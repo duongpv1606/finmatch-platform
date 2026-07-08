@@ -8,7 +8,10 @@ import {
   LeadProfile,
   initialLeadProfile,
   runChatFlow,
+  calcAnalysis,
+  goalToCategory,
 } from "@/lib/chatFlow";
+import { createLead } from "@/services/leadsService";
 
 export function useChatSession(initialQuery?: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -17,6 +20,7 @@ export function useChatSession(initialQuery?: string) {
   const stateRef = useRef<ConvState>("init");
   const sessionIdRef = useRef<string>(crypto.randomUUID());
   const startedRef = useRef(false);
+  const leadCreatedRef = useRef(false);
 
   useEffect(() => {
     if (initialQuery && !startedRef.current) {
@@ -86,6 +90,24 @@ export function useChatSession(initialQuery?: string) {
     const flow = runChatFlow(stateRef.current, profile, text);
     stateRef.current = flow.nextState;
     setProfile(flow.profile);
+
+    if (flow.nextState === "done" && flow.profile.phone && !leadCreatedRef.current) {
+      leadCreatedRef.current = true;
+      const analysis = calcAnalysis(flow.profile);
+      void createLead({
+        customerName: flow.profile.name ?? "Khách chưa rõ tên",
+        phone: flow.profile.phone,
+        email: flow.profile.email ?? undefined,
+        productCategory: goalToCategory(flow.profile.goal),
+        source: "ai_chat",
+        score: analysis.approval,
+        region: "Không rõ",
+      }).catch(() => {
+        // Non-critical — the chat UX shouldn't break if lead creation
+        // fails (e.g. backend briefly unavailable). Sale marketplace
+        // just won't see this one lead.
+      });
+    }
 
     setMessages((prev) =>
       prev.map((m) =>
