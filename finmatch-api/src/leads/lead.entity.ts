@@ -54,6 +54,9 @@ export class Lead {
   @Column({ type: 'timestamptz', nullable: true })
   purchasedAt?: Date;
 
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

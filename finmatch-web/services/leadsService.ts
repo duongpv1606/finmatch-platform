@@ -27,6 +27,7 @@ export interface PurchasedLead extends MarketplaceLead {
   customerName: string;
   phone: string;
   email?: string;
+  notes?: string;
 }
 
 export async function createLead(input: CreateLeadInput): Promise<void> {

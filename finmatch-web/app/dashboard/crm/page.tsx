@@ -1,16 +1,13 @@
-import { AppShell } from "@/components/layout/AppShell";
+"use client";
 
-export default function CRMPage() {
+import { AppShell } from "@/components/layout/AppShell";
+import { CrmPage } from "@/components/sale/CrmPage";
+
+export default function CrmRoutePage() {
   return (
-    <AppShell title="CRM của tôi">
+    <AppShell title="CRM cá nhân">
       <div className="page active" style={{ padding: "22px 28px" }}>
-        <div className="card">
-          <div className="sec-eyebrow">CRM của tôi</div>
-          <h3 style={{ marginBottom: 8 }}>CRM của tôi</h3>
-          <p className="text-sm text-muted">
-            TODO: danh sách khách hàng theo giai đoạn — nối leadService.
-          </p>
-        </div>
+        <CrmPage />
       </div>
     </AppShell>
   );
