@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { CompareTable } from "@/components/compare/CompareTable";
+
+export const metadata: Metadata = {
+  title: "So sánh sản phẩm tài chính",
+  description:
+    "So sánh lãi suất, phí, điều kiện và đánh giá của các sản phẩm vay, thẻ tín dụng, bảo hiểm, tiết kiệm — tìm kiếm, lọc, sắp xếp theo nhu cầu của bạn.",
+  alternates: { canonical: "/compare" },
+};
 
 export default function ComparePage() {
   return (

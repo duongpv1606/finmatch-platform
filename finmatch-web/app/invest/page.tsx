@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProductCard } from "@/components/home/ProductCard";
 import { getProducts } from "@/services/productsService";
+
+export const metadata: Metadata = {
+  title: "Đầu tư",
+  description: "So sánh sản phẩm đầu tư, quỹ mở, chứng chỉ quỹ phù hợp với khẩu vị rủi ro của bạn.",
+  alternates: { canonical: "/invest" },
+};
 
 export default async function InvestPage() {
   const products = await getProducts("invest");

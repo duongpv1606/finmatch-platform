@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProductCard } from "@/components/home/ProductCard";
 import { getProducts } from "@/services/productsService";
+
+export const metadata: Metadata = {
+  title: "Tiết kiệm",
+  description: "So sánh lãi suất tiết kiệm các kỳ hạn từ ngân hàng — tìm mức lãi suất tốt nhất cho khoản tiết kiệm của bạn.",
+  alternates: { canonical: "/savings" },
+};
 
 export default async function SavingsPage() {
   const products = await getProducts("savings");

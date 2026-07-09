@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProductCard } from "@/components/home/ProductCard";
 import { getProducts } from "@/services/productsService";
+
+export const metadata: Metadata = {
+  title: "Bảo hiểm",
+  description: "So sánh sản phẩm bảo hiểm nhân thọ, sức khỏe, tài sản từ các công ty bảo hiểm uy tín.",
+  alternates: { canonical: "/insurance" },
+};
 
 export default async function InsurancePage() {
   const products = await getProducts("insurance");

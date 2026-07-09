@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { getExchangeRates, getGoldPrices, getNews } from "@/services/marketService";
+
+export const metadata: Metadata = {
+  title: "Tin tức tài chính",
+  description:
+    "Tin tức tài chính, ngân hàng mới nhất, giá vàng SJC/DOJI và tỷ giá ngoại tệ cập nhật realtime.",
+  alternates: { canonical: "/news" },
+};
 
 const CATEGORIES = ["Lãi suất", "Vay vốn", "Thẻ tín dụng", "Đầu tư", "Bảo hiểm", "Crypto"];
 

@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { HeroSearch } from "@/components/home/HeroSearch";
 import { RateChart } from "@/components/home/RateChart";
 import { TrendingProducts } from "@/components/home/TrendingProducts";
 import { FinancialHealthCard } from "@/components/home/FinancialHealthCard";
 import { NewsList } from "@/components/home/NewsList";
+
+export const metadata: Metadata = {
+  title: "Trang chủ",
+  description:
+    "So sánh lãi suất vay, thẻ tín dụng, bảo hiểm, đầu tư và tiết kiệm từ các ngân hàng hàng đầu Việt Nam — tư vấn bằng AI, cập nhật realtime.",
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
   return (

@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { MortgageCalculator } from "@/components/calc/MortgageCalculator";
+
+export const metadata: Metadata = {
+  title: "Máy tính tài chính",
+  description:
+    "Tính khoản trả góp vay mua nhà hàng tháng, tổng lãi phải trả, và biểu đồ dư nợ giảm dần — công cụ tính toán chính xác cho thị trường Việt Nam.",
+  alternates: { canonical: "/calc" },
+};
 
 export default function CalcPage() {
   return (
