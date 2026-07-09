@@ -11,6 +11,8 @@ import { MarketModule } from './market/market.module';
 import { AiModule } from './ai/ai.module';
 import { RecommendationModule } from './recommendation/recommendation.module';
 import { LeadsModule } from './leads/leads.module';
+import { MembershipModule } from './membership/membership.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { LeadsModule } from './leads/leads.module';
     AiModule,
     RecommendationModule,
     LeadsModule,
+    MembershipModule,
+    PaymentsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -1,16 +1,16 @@
-import { AppShell } from "@/components/layout/AppShell";
+"use client";
 
-export default function MembershipPage() {
+import { Suspense } from "react";
+import { AppShell } from "@/components/layout/AppShell";
+import { MembershipPage } from "@/components/membership/MembershipPage";
+
+export default function DashboardMembershipPage() {
   return (
     <AppShell title="Gói thành viên">
       <div className="page active" style={{ padding: "22px 28px" }}>
-        <div className="card">
-          <div className="sec-eyebrow">Gói thành viên</div>
-          <h3 style={{ marginBottom: 8 }}>Gói thành viên</h3>
-          <p className="text-sm text-muted">
-            TODO: bảng giá + tích hợp Stripe/VNPay/Momo/ZaloPay qua paymentService.
-          </p>
-        </div>
+        <Suspense fallback={null}>
+          <MembershipPage />
+        </Suspense>
       </div>
     </AppShell>
   );

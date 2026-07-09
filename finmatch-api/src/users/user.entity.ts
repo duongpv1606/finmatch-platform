@@ -47,6 +47,12 @@ export class User {
   @Column({ type: 'int', default: 100 })
   credits: number;
 
+  @Column({ default: 'free' })
+  membershipTier: 'free' | 'pro' | 'elite';
+
+  @Column({ type: 'timestamptz', nullable: true })
+  membershipExpiresAt?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

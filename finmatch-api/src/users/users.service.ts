@@ -39,6 +39,10 @@ export class UsersService {
     await this.repo.update(userId, { role });
   }
 
+  async setMembership(userId: string, tier: 'free' | 'pro' | 'elite', expiresAt: Date) {
+    await this.repo.update(userId, { membershipTier: tier, membershipExpiresAt: expiresAt });
+  }
+
   async deductCredits(userId: string, amount: number): Promise<boolean> {
     // Atomic conditional update — only deducts if enough balance, avoids a
     // race where two purchases both read "enough credits" before either
