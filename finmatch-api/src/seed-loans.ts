@@ -41,13 +41,21 @@ const ROWS: LoanRow[] = [
 ];
 
 async function main() {
-  const client = new Client({
-    host: process.env.DB_HOST ?? 'localhost',
-    port: Number(process.env.DB_PORT ?? 5432),
-    user: process.env.DB_USER ?? 'postgres',
-    password: process.env.DB_PASSWORD ?? 'postgres',
-    database: process.env.DB_NAME ?? 'finmatch',
-  });
+  // `railway run` injects DB_HOST as Railway's *internal* hostname
+  // (postgres.railway.internal), which only resolves inside Railway's own
+  // network — not from a local machine. Support DATABASE_URL (the public
+  // connection string, from Postgres service → Variables →
+  // DATABASE_PUBLIC_URL in Railway) as an override so this script also
+  // works when run locally against production.
+  const client = process.env.DATABASE_URL
+    ? new Client({ connectionString: process.env.DATABASE_URL })
+    : new Client({
+        host: process.env.DB_HOST ?? 'localhost',
+        port: Number(process.env.DB_PORT ?? 5432),
+        user: process.env.DB_USER ?? 'postgres',
+        password: process.env.DB_PASSWORD ?? 'postgres',
+        database: process.env.DB_NAME ?? 'finmatch',
+      });
   await client.connect();
 
   let inserted = 0;

@@ -6,13 +6,19 @@ import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 
 async function main() {
-  const client = new Client({
-    host: process.env.DB_HOST ?? 'localhost',
-    port: Number(process.env.DB_PORT ?? 5432),
-    user: process.env.DB_USER ?? 'postgres',
-    password: process.env.DB_PASSWORD ?? 'postgres',
-    database: process.env.DB_NAME ?? 'finmatch',
-  });
+  // `railway run` injects DB_HOST as Railway's internal-only hostname —
+  // doesn't resolve from a local machine. DATABASE_URL (public connection
+  // string from Postgres service → Variables → DATABASE_PUBLIC_URL)
+  // overrides that when running this script locally against production.
+  const client = process.env.DATABASE_URL
+    ? new Client({ connectionString: process.env.DATABASE_URL })
+    : new Client({
+        host: process.env.DB_HOST ?? 'localhost',
+        port: Number(process.env.DB_PORT ?? 5432),
+        user: process.env.DB_USER ?? 'postgres',
+        password: process.env.DB_PASSWORD ?? 'postgres',
+        database: process.env.DB_NAME ?? 'finmatch',
+      });
   await client.connect();
 
   const adminEmail = 'admin@finmatch.vn';
