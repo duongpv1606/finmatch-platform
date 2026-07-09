@@ -7,7 +7,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 export function ProductCard({ product }: { product: FinancialProduct }) {
   const router = useRouter();
-  const { openAuthModal } = useAppStore();
+  const { openQuickLeadModal } = useAppStore();
   const aiScore = Math.round((product.rating / 5) * 100) || 70; // fallback so a 0-rating seed product still shows a sensible bar
 
   return (
@@ -80,7 +80,7 @@ export function ProductCard({ product }: { product: FinancialProduct }) {
           Hỏi AI
         </button>
         <button
-          onClick={() => openAuthModal("register")}
+          onClick={openQuickLeadModal}
           style={{
             flex: 1,
             background: "var(--emerald)",

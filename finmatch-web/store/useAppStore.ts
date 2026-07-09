@@ -13,6 +13,7 @@ interface AppState {
   lang: "vi" | "en";
   authModalOpen: boolean;
   authView: AuthView;
+  quickLeadModalOpen: boolean;
 
   setUser: (u: User | null) => void;
   setRole: (r: UserRole) => void;
@@ -22,6 +23,9 @@ interface AppState {
   openAuthModal: (view: AuthView) => void;
   closeAuthModal: () => void;
   switchAuthView: (view: AuthView) => void;
+
+  openQuickLeadModal: () => void;
+  closeQuickLeadModal: () => void;
 
   setSession: (user: User) => void;
   logoutLocal: () => void;
@@ -35,6 +39,7 @@ export const useAppStore = create<AppState>((set) => ({
   lang: "vi",
   authModalOpen: false,
   authView: "login",
+  quickLeadModalOpen: false,
 
   setUser: (user) => set({ user, role: user?.role ?? "customer" }),
   setRole: (role) => set({ role }),
@@ -44,6 +49,9 @@ export const useAppStore = create<AppState>((set) => ({
   openAuthModal: (view) => set({ authModalOpen: true, authView: view }),
   closeAuthModal: () => set({ authModalOpen: false }),
   switchAuthView: (view) => set({ authView: view }),
+
+  openQuickLeadModal: () => set({ quickLeadModalOpen: true }),
+  closeQuickLeadModal: () => set({ quickLeadModalOpen: false }),
 
   setSession: (user) =>
     set({ user, role: user.role, authModalOpen: false }),

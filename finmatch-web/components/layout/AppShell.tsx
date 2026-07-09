@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
+import { FloatingAskAI } from "@/components/shared/FloatingAskAI";
 
 export function AppShell({
   title,
@@ -18,6 +19,7 @@ export function AppShell({
         <Topbar title={title} />
         {children}
       </div>
+      <FloatingAskAI />
     </>
   );
 }

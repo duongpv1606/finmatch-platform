@@ -10,12 +10,21 @@ const STATS = [
   { target: "2.8 tỷ", label: "Doanh thu tháng" },
 ];
 
+const CHIPS = [
+  { emoji: "🏠", text: "Mua nhà" },
+  { emoji: "💸", text: "Vay cá nhân" },
+  { emoji: "📈", text: "Đầu tư hay tiết kiệm?" },
+  { emoji: "⚖️", text: "So sánh vay" },
+  { emoji: "💳", text: "Thẻ hoàn tiền tốt nhất" },
+];
+
 export function HeroSearch() {
   const [value, setValue] = useState("");
   const router = useRouter();
 
-  function goToAI() {
-    router.push(`/ai${value ? `?q=${encodeURIComponent(value)}` : ""}`);
+  function goToAI(query?: string) {
+    const q = query ?? value;
+    router.push(`/ai${q ? `?q=${encodeURIComponent(q)}` : ""}`);
   }
 
   return (
@@ -37,9 +46,16 @@ export function HeroSearch() {
           onKeyDown={(e) => e.key === "Enter" && goToAI()}
           placeholder="Tôi muốn mua nhà. Thu nhập 20 triệu/tháng..."
         />
-        <button className="hero-send-btn" onClick={goToAI}>
+        <button className="hero-send-btn" onClick={() => goToAI()}>
           <i className="ti ti-arrow-right" />
         </button>
+      </div>
+      <div className="quick-chips">
+        {CHIPS.map((c) => (
+          <div key={c.text} className="qchip" onClick={() => goToAI(c.text)}>
+            {c.emoji} {c.text}
+          </div>
+        ))}
       </div>
       <div className="hero-stats">
         {STATS.map((s, i) => (

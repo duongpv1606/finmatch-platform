@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useEffect, useState } from "react";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { QuickLeadModal } from "@/components/shared/QuickLeadModal";
 import { useAppStore } from "@/store/useAppStore";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -17,6 +18,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={client}>
       {children}
       <AuthModal />
+      <QuickLeadModal />
     </QueryClientProvider>
   );
 }

@@ -5,7 +5,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 export function LeadCaptureBanner() {
   const router = useRouter();
-  const { user, openAuthModal } = useAppStore();
+  const { user, openQuickLeadModal } = useAppStore();
 
   if (user) return null; // already a lead/customer — no need to prompt
 
@@ -69,7 +69,7 @@ export function LeadCaptureBanner() {
           Hỏi AI ngay
         </button>
         <button
-          onClick={() => openAuthModal("register")}
+          onClick={openQuickLeadModal}
           style={{
             background: "var(--blue)",
             border: "none",
