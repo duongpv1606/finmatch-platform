@@ -19,6 +19,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: "/", label: "Tổng quan", icon: "layout-dashboard" },
       { href: "/ai", label: "Tư vấn AI", icon: "brain", badge: { text: "Mới", color: "var(--blue)" } },
+      { href: "/messages", label: "Tin nhắn", icon: "mail" },
     ],
   },
   {

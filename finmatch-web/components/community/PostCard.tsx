@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppStore } from "@/store/useAppStore";
 import { CommunityPost, addComment, toggleLike } from "@/services/communityService";
@@ -27,6 +28,7 @@ function timeAgo(iso: string): string {
 
 export function PostCard({ post }: { post: CommunityPost }) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { user, openAuthModal } = useAppStore();
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -54,6 +56,17 @@ export function PostCard({ post }: { post: CommunityPost }) {
     queryClient.invalidateQueries({ queryKey: ["community", "posts"] });
   }
 
+  function handleMessageAuthor() {
+    if (!user) {
+      openAuthModal("login");
+      return;
+    }
+    if (post.authorId === user.id) return;
+    router.push(
+      `/messages?with=${post.authorId}&name=${encodeURIComponent(post.authorName)}&role=${post.authorRole}`
+    );
+  }
+
   const role = ROLE_STYLE[post.authorRole] ?? ROLE_STYLE.customer;
 
   return (
@@ -70,6 +83,30 @@ export function PostCard({ post }: { post: CommunityPost }) {
           </div>
           <div style={{ fontSize: 11, color: "var(--gray-400)" }}>{timeAgo(post.createdAt)}</div>
         </div>
+        {user && post.authorId !== user.id && (
+          <button
+            onClick={handleMessageAuthor}
+            title={`Nhắn tin cho ${post.authorName}`}
+            style={{
+              background: "var(--gray-50)",
+              border: "1px solid var(--gray-200)",
+              borderRadius: 8,
+              padding: "6px 10px",
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--gray-500)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              flexShrink: 0,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <i className="ti ti-mail" style={{ fontSize: 12 }} />
+            Nhắn tin
+          </button>
+        )}
       </div>
 
       <p style={{ fontSize: 13, color: "var(--gray-700)", lineHeight: 1.65, marginBottom: 14 }}>{post.text}</p>
@@ -99,6 +136,27 @@ export function PostCard({ post }: { post: CommunityPost }) {
               <span className={`post-role-pill ${cRole.cls}`} style={{ fontSize: 9, padding: "1px 6px" }}>
                 {cRole.label}
               </span>
+              {user && c.authorId !== user.id && (
+                <button
+                  onClick={() =>
+                    router.push(
+                      `/messages?with=${c.authorId}&name=${encodeURIComponent(c.authorName)}&role=${c.authorRole}`
+                    )
+                  }
+                  title={`Nhắn tin cho ${c.authorName}`}
+                  style={{
+                    marginLeft: "auto",
+                    background: "none",
+                    border: "none",
+                    color: "var(--gray-400)",
+                    cursor: "pointer",
+                    fontSize: 12,
+                    padding: 2,
+                  }}
+                >
+                  <i className="ti ti-mail" />
+                </button>
+              )}
             </div>
             {c.text}
           </div>

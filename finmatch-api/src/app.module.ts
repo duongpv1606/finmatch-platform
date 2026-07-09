@@ -14,6 +14,7 @@ import { LeadsModule } from './leads/leads.module';
 import { MembershipModule } from './membership/membership.module';
 import { PaymentsModule } from './payments/payments.module';
 import { CommunityModule } from './community/community.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { CommunityModule } from './community/community.module';
     MembershipModule,
     PaymentsModule,
     CommunityModule,
+    MessagesModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -2,13 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { NAV_SECTIONS, isNavItemVisible } from "@/constants/nav";
 import { useAppStore } from "@/store/useAppStore";
 import * as authService from "@/services/authService";
+import { getUnreadCount } from "@/services/messagesService";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { role, user, openAuthModal, logoutLocal } = useAppStore();
+
+  const { data: unreadCount } = useQuery({
+    queryKey: ["messages", "unread-count"],
+    queryFn: getUnreadCount,
+    enabled: !!user,
+    refetchInterval: 15000,
+  });
 
   async function handleLogout() {
     await authService.logout();
@@ -34,6 +43,10 @@ export function Sidebar() {
               <div className="nav-section-label">{section.label}</div>
               {visibleItems.map((item) => {
                 const active = pathname === item.href;
+                const liveBadge =
+                  item.href === "/messages" && unreadCount && unreadCount > 0
+                    ? { text: String(unreadCount), color: "var(--red, #DC2626)" }
+                    : item.badge;
                 return (
                   <Link
                     key={item.href}
@@ -42,12 +55,12 @@ export function Sidebar() {
                   >
                     <i className={`ti ti-${item.icon}`} />
                     <span>{item.label}</span>
-                    {item.badge && (
+                    {liveBadge && (
                       <span
                         className="nav-badge"
-                        style={{ background: item.badge.color, color: "#fff" }}
+                        style={{ background: liveBadge.color, color: "#fff" }}
                       >
-                        {item.badge.text}
+                        {liveBadge.text}
                       </span>
                     )}
                   </Link>
