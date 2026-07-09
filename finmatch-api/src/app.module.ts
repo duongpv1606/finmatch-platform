@@ -16,6 +16,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { CommunityModule } from './community/community.module';
 import { MessagesModule } from './messages/messages.module';
 import { UploadModule } from './upload/upload.module';
+import { PlatformModule } from './platform/platform.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { UploadModule } from './upload/upload.module';
     CommunityModule,
     MessagesModule,
     UploadModule,
+    PlatformModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

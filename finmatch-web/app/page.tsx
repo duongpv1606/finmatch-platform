@@ -4,7 +4,12 @@ import { HeroSearch } from "@/components/home/HeroSearch";
 import { RateChart } from "@/components/home/RateChart";
 import { TrendingProducts } from "@/components/home/TrendingProducts";
 import { FinancialHealthCard } from "@/components/home/FinancialHealthCard";
+import { SmartRecommendationCard } from "@/components/home/SmartRecommendationCard";
+import { TopHotRanking } from "@/components/home/TopHotRanking";
+import { PlatformStatsRow } from "@/components/home/PlatformStatsRow";
+import { PartnerLogosRow } from "@/components/home/PartnerLogosRow";
 import { NewsList } from "@/components/home/NewsList";
+import { getPlatformStats } from "@/services/platformService";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +20,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const stats = await getPlatformStats();
+
   return (
     <AppShell title="Tổng quan">
       <div className="page active" style={{ padding: "22px 28px" }}>
@@ -36,7 +43,10 @@ export default function HomePage() {
               <span>Dữ liệu cập nhật realtime</span>
             </div>
           </div>
+          <PartnerLogosRow />
         </div>
+
+        <PlatformStatsRow stats={stats} />
 
         <div className="grid-main mb20">
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -45,6 +55,44 @@ export default function HomePage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <FinancialHealthCard />
+            <SmartRecommendationCard />
+            <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+              <div
+                style={{
+                  background: "linear-gradient(135deg,#FF6B35,#F7374F)",
+                  padding: "14px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <i className="ti ti-flame" style={{ color: "white", fontSize: 18 }} />
+                  <h3 style={{ color: "white", fontSize: 14, fontWeight: 800, letterSpacing: "-.2px" }}>
+                    TOP HOT — Bảng xếp hạng
+                  </h3>
+                </div>
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                    background: "rgba(255,255,255,.2)",
+                    padding: "3px 9px",
+                    borderRadius: 20,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: "white",
+                  }}
+                >
+                  <span className="live-dot" style={{ background: "white" }} />
+                  LIVE
+                </span>
+              </div>
+              <div style={{ padding: "6px 12px 12px" }}>
+                <TopHotRanking products={stats.topProducts} />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -58,7 +106,7 @@ export default function HomePage() {
               </div>
             </div>
             <div style={{ color: "var(--gray-400)", fontSize: 13 }}>
-              Kết nối CMS để quản lý danh sách ưu đãi tại đây.
+              Chưa có ưu đãi nào được cấu hình — Admin có thể thêm ở CMS (sắp có).
             </div>
           </div>
         </div>
