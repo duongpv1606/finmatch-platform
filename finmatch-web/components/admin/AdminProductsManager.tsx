@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProducts, deleteProduct } from "@/services/productsService";
 import { FinancialProduct } from "@/types";
 import { AdminProductForm } from "./AdminProductForm";
+import { BankLogo } from "@/components/shared/BankLogo";
 
 export function AdminProductsManager() {
   const queryClient = useQueryClient();
@@ -86,7 +87,12 @@ export function AdminProductsManager() {
               {products?.map((p) => (
                 <tr key={p.id}>
                   <td>{p.category}</td>
-                  <td style={{ fontWeight: 700 }}>{p.bankName}</td>
+                  <td style={{ fontWeight: 700 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <BankLogo name={p.bankName} logoUrl={p.bankLogoUrl} size={22} />
+                      {p.bankName}
+                    </div>
+                  </td>
                   <td>{p.name}</td>
                   <td style={{ color: "var(--blue)", fontWeight: 800 }}>{p.interestRate}%</td>
                   <td>

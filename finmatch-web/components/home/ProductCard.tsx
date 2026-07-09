@@ -1,25 +1,11 @@
 import { FinancialProduct } from "@/types";
+import { BankLogo } from "@/components/shared/BankLogo";
 
 export function ProductCard({ product }: { product: FinancialProduct }) {
   return (
     <div className="card" style={{ padding: 14 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 8,
-            background: "var(--gray-100)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: 800,
-            fontSize: 11,
-            color: "var(--navy)",
-          }}
-        >
-          {product.bankName.slice(0, 2).toUpperCase()}
-        </div>
+        <BankLogo name={product.bankName} logoUrl={product.bankLogoUrl} size={32} />
         <div style={{ fontSize: 12, fontWeight: 700, color: "var(--gray-600)" }}>
           {product.bankName}
         </div>

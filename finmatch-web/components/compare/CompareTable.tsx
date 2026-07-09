@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ProductCategory } from "@/types";
 import { searchProducts, ProductSearchParams } from "@/services/productsService";
+import { BankLogo } from "@/components/shared/BankLogo";
 
 const TABS: { id: ProductCategory; label: string }[] = [
   { id: "loan", label: "Vay mua nhà" },
@@ -147,7 +148,12 @@ export function CompareTable() {
               )}
               {data?.items.map((p) => (
                 <tr key={p.id}>
-                  <td style={{ fontWeight: 700 }}>{p.bankName}</td>
+                  <td style={{ fontWeight: 700 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <BankLogo name={p.bankName} logoUrl={p.bankLogoUrl} size={24} />
+                      {p.bankName}
+                    </div>
+                  </td>
                   <td>{p.name}</td>
                   <td style={{ color: "var(--blue)", fontWeight: 800 }}>{p.interestRate}%</td>
                   <td>

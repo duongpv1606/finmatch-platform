@@ -112,9 +112,19 @@ export function AIRecommendationCard({ data }: { data: RecommendationResponse })
 
       <div className="ai-reco-bank-box">
         <div className="ai-reco-bank-top">
-          <div className="ai-reco-bank-logo" style={{ background: bankStyle.bg }}>
-            {bankStyle.initials}
-          </div>
+          {top.product.bankLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={top.product.bankLogoUrl}
+              alt={top.product.bankName}
+              className="ai-reco-bank-logo"
+              style={{ objectFit: "cover", background: "white" }}
+            />
+          ) : (
+            <div className="ai-reco-bank-logo" style={{ background: bankStyle.bg }}>
+              {bankStyle.initials}
+            </div>
+          )}
           <div>
             <div className="ai-reco-bank-name">{top.product.bankName}</div>
             <div className="ai-reco-bank-rate">
