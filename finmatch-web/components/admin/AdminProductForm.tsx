@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { FinancialProduct, ProductCategory } from "@/types";
 import { CreateProductInput, createProduct, updateProduct } from "@/services/productsService";
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
+import { uploadAsset } from "@/services/uploadService";
 
 const CATEGORIES: { value: ProductCategory; label: string }[] = [
   { value: "loan", label: "Vay vốn" },
@@ -24,6 +26,7 @@ export function AdminProductForm({
   const [category, setCategory] = useState<ProductCategory>(editing?.category ?? "loan");
   const [bankId, setBankId] = useState(editing?.bankId ?? "");
   const [bankName, setBankName] = useState(editing?.bankName ?? "");
+  const [bankLogoUrl, setBankLogoUrl] = useState(editing?.bankLogoUrl ?? "");
   const [name, setName] = useState(editing?.name ?? "");
   const [interestRate, setInterestRate] = useState(editing?.interestRate ?? 6.5);
   const [minAmount, setMinAmount] = useState((editing?.minAmount ?? 100_000_000) / 1e6);
@@ -49,6 +52,7 @@ export function AdminProductForm({
       if (editing) {
         await updateProduct(editing.id, {
           bankName,
+          bankLogoUrl: bankLogoUrl || undefined,
           name,
           interestRate,
           minAmount: Math.round(minAmount * 1e6),
@@ -61,6 +65,7 @@ export function AdminProductForm({
           category,
           bankId: bankId || bankName.toLowerCase().replace(/\s+/g, "-"),
           bankName,
+          bankLogoUrl: bankLogoUrl || undefined,
           name,
           interestRate,
           minAmount: Math.round(minAmount * 1e6),
@@ -106,6 +111,12 @@ export function AdminProductForm({
             placeholder="Vietcombank"
           />
         </div>
+        <ImageUploadField
+          label="Logo ngân hàng"
+          value={bankLogoUrl}
+          onUploaded={setBankLogoUrl}
+          upload={(file) => uploadAsset(file, "logos")}
+        />
         <div className="calc-input-group" style={{ gridColumn: "span 2" }}>
           <label className="calc-label">Tên sản phẩm</label>
           <input

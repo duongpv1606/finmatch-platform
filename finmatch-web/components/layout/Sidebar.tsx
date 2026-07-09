@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { NAV_SECTIONS, isNavItemVisible } from "@/constants/nav";
 import { useAppStore } from "@/store/useAppStore";
 import * as authService from "@/services/authService";
 import { getUnreadCount } from "@/services/messagesService";
+import { uploadAvatar } from "@/services/uploadService";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { role, user, openAuthModal, logoutLocal } = useAppStore();
+  const { role, user, openAuthModal, logoutLocal, setUser } = useAppStore();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { data: unreadCount } = useQuery({
     queryKey: ["messages", "unread-count"],
@@ -22,6 +25,18 @@ export function Sidebar() {
   async function handleLogout() {
     await authService.logout();
     logoutLocal();
+  }
+
+  async function handleAvatarChange(file: File | undefined) {
+    if (!file || !user) return;
+    try {
+      const url = await uploadAvatar(file);
+      setUser({ ...user, avatarUrl: url });
+    } catch {
+      // Non-critical — silently keep the old avatar if upload fails
+      // (e.g. Cloudinary not configured yet); no need to interrupt
+      // navigation with an error for a cosmetic action.
+    }
   }
 
   return (
@@ -113,7 +128,26 @@ export function Sidebar() {
           </div>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 8px" }}>
-            <div className="user-avatar">{user.name.charAt(0)}</div>
+            <div
+              className="user-avatar"
+              onClick={() => avatarInputRef.current?.click()}
+              title="Đổi ảnh đại diện"
+              style={{
+                cursor: "pointer",
+                backgroundImage: user.avatarUrl ? `url(${user.avatarUrl})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              {!user.avatarUrl && user.name.charAt(0)}
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              style={{ display: "none" }}
+              onChange={(e) => handleAvatarChange(e.target.files?.[0])}
+            />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="user-name" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {user.name}
