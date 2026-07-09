@@ -3,6 +3,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { ProductCard } from "@/components/home/ProductCard";
 import { getProducts } from "@/services/productsService";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Vay vốn",
   description: "So sánh lãi suất vay mua nhà, vay tiêu dùng từ các ngân hàng hàng đầu Việt Nam. Cập nhật lãi suất, hạn mức, điều kiện vay realtime.",

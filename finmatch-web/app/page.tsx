@@ -6,6 +6,8 @@ import { TrendingProducts } from "@/components/home/TrendingProducts";
 import { FinancialHealthCard } from "@/components/home/FinancialHealthCard";
 import { NewsList } from "@/components/home/NewsList";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Trang chủ",
   description:

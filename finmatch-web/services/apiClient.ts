@@ -23,6 +23,12 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
+    // Without this, Next.js server components (e.g. /loans, /) cache the
+    // response indefinitely by default — new products added via Admin or
+    // a seed script wouldn't show up until the next deploy. This data
+    // changes constantly (admin edits, crawlers, leads), so always fetch
+    // fresh rather than serving a stale build-time snapshot.
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       ...init?.headers,
@@ -52,6 +58,7 @@ export async function authedFetch<T>(
   async function attempt(token: string | null): Promise<Response> {
     return fetch(`${API_BASE_URL}${path}`, {
       ...init,
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { getExchangeRates, getGoldPrices, getNews } from "@/services/marketService";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Tin tức tài chính",
   description:
