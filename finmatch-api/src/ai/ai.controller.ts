@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,6 +20,11 @@ export class AiController {
 
   // Streams plain text chunks (not SSE) — matches the frontend's
   // `res.body.getReader()` + `TextDecoder` loop in services/aiChatService.ts.
+  //
+  // Throttled tighter than the global default — every call costs real
+  // money via the LLM provider, so this is the endpoint most worth
+  // protecting from scripted abuse.
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @Post('chat')
   async chat(@Body() dto: ChatRequestDto, @Res() res: Response) {
     const lastUserMsg = dto.messages[dto.messages.length - 1];

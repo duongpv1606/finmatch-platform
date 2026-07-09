@@ -2,8 +2,22 @@ import { ChatMessage } from "@/types";
 
 // Matches the original HTML's lightweight markdown: only **bold**, nothing
 // else — intentionally simple, not a full markdown renderer.
-function formatText(text: string): string {
+//
+// IMPORTANT: escape HTML entities FIRST, then apply the bold/newline
+// transforms on the escaped text. Without this, a message containing
+// something like `<img src=x onerror=alert(1)>` would execute as real
+// HTML via dangerouslySetInnerHTML below — this used to be a real XSS hole.
+function escapeHtml(text: string): string {
   return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatText(text: string): string {
+  return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\n/g, "<br/>");
 }

@@ -1,5 +1,6 @@
 import { Body, Controller, Post, UseGuards, Get, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import type { JwtPayload } from './auth.service';
 import { LoginDto, RefreshDto, RegisterDto } from './dto/auth.dto';
@@ -15,11 +16,18 @@ export class AuthController {
     private readonly users: UsersService,
   ) {}
 
+  // Stricter than the global 120/min — registration spam is cheap to
+  // script and expensive to clean up (fake accounts, fake leads).
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto);
   }
 
+  // Stricter still — login is the classic brute-force target. 5 tries/min
+  // per IP is enough for a real person who mistyped a password, not
+  // enough to meaningfully brute-force one.
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post('login')
   @HttpCode(200)
   login(@Body() dto: LoginDto) {

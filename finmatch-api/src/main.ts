@@ -1,11 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(
+    helmet({
+      // CSP disabled: this process also serves Swagger UI (inline
+      // scripts) and a strict default CSP would break it. The actual
+      // website is a separate Next.js app on Vercel with its own
+      // headers — this process is API-only, so CSP matters less here.
+      // Other Helmet protections (X-Frame-Options, X-Content-Type-Options,
+      // HSTS, etc.) stay on.
+      contentSecurityPolicy: false,
+    }),
+  );
   app.enableCors({ origin: process.env.CORS_ORIGIN?.split(',') ?? '*' });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
