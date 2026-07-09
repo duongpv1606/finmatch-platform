@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { VnpayService } from './vnpay.service';
+import { MomoService } from './momo.service';
 import { PaymentsController } from './payments.controller';
 import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [UsersModule],
-  providers: [StripeService, VnpayService],
+  providers: [StripeService, VnpayService, MomoService],
   controllers: [PaymentsController],
 })
 export class PaymentsModule {}

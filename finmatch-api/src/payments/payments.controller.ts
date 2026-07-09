@@ -16,6 +16,7 @@ import type { RawBodyRequest } from '@nestjs/common';
 import { IsIn } from 'class-validator';
 import { StripeService } from './stripe.service';
 import { VnpayService } from './vnpay.service';
+import { MomoService } from './momo.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/auth.service';
@@ -33,6 +34,7 @@ export class PaymentsController {
   constructor(
     private readonly stripe: StripeService,
     private readonly vnpay: VnpayService,
+    private readonly momo: MomoService,
     private readonly users: UsersService,
   ) {}
 
@@ -100,5 +102,31 @@ export class PaymentsController {
     const result = await this.vnpay.handleReturn(query);
     const url = `${redirect}?payment=${result.success ? 'success' : 'failed'}&message=${encodeURIComponent(result.message)}`;
     return res.redirect(url);
+  }
+
+  // ── Momo ──
+  // Returns payUrl (web checkout), deeplink (open Momo app), AND
+  // qrCodeUrl (QR code image) in one response — covers both "pay via
+  // Momo app" and "scan QR to pay" with a single integration.
+
+  @Post('momo/checkout')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async momoCheckout(@Body() dto: CheckoutDto, @CurrentUser() user: JwtPayload) {
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    const apiUrl = process.env.API_PUBLIC_URL ?? 'http://localhost:3001/api';
+    return this.momo.createPayment(
+      user.sub,
+      dto.tier,
+      `${frontendUrl}/dashboard/membership`,
+      `${apiUrl}/payments/momo/ipn`,
+    );
+  }
+
+  // Server-to-server callback from Momo (not the browser) — signature is
+  // verified inside handleIpn before any membership change is trusted.
+  @Post('momo/ipn')
+  async momoIpn(@Body() body: Record<string, string | number>) {
+    return this.momo.handleIpn(body);
   }
 }
