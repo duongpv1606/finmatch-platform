@@ -13,6 +13,7 @@ import { RecommendationModule } from './recommendation/recommendation.module';
 import { LeadsModule } from './leads/leads.module';
 import { MembershipModule } from './membership/membership.module';
 import { PaymentsModule } from './payments/payments.module';
+import { CommunityModule } from './community/community.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { PaymentsModule } from './payments/payments.module';
     LeadsModule,
     MembershipModule,
     PaymentsModule,
+    CommunityModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
