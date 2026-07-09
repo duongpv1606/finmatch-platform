@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
 import { HeroSearch } from "@/components/home/HeroSearch";
+import { LeadCaptureBanner } from "@/components/home/LeadCaptureBanner";
 import { RateChart } from "@/components/home/RateChart";
 import { TrendingProducts } from "@/components/home/TrendingProducts";
 import { FinancialHealthCard } from "@/components/home/FinancialHealthCard";
@@ -27,6 +28,8 @@ export default async function HomePage() {
     <AppShell title="Tổng quan">
       <div className="page active" style={{ padding: "22px 28px" }}>
         <HeroSearch />
+
+        <LeadCaptureBanner />
 
         <div className="trust-strip">
           <div className="trust-badges">
