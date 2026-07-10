@@ -46,12 +46,12 @@ export function CompareTable() {
 
   function handleTabChange(newTab: ProductCategory) {
     setTab(newTab);
-    // interestRate doubles as cashback % for cards (higher = better) but
-    // annual rate for loans/savings (lower = better) — flip the default
-    // sort direction so "best first" is correct for whichever tab is
-    // active, instead of always defaulting to ascending.
+    // interestRate doubles as cashback %/savings rate for cards & savings
+    // (higher = better) but annual rate for loans/insurance (lower =
+    // better) — flip the default sort direction so "best first" is
+    // correct for whichever tab is active.
     if (sortBy === "interestRate") {
-      setSortOrder(newTab === "card" ? "DESC" : "ASC");
+      setSortOrder(newTab === "card" || newTab === "savings" ? "DESC" : "ASC");
     }
   }
 
