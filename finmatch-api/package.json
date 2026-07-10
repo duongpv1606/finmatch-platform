@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node src/seed.ts",
     "seed:loans": "ts-node src/seed-loans.ts",
-    "seed:cards": "ts-node src/seed-cards.ts"
+    "seed:cards": "ts-node src/seed-cards.ts",
+    "seed:savings": "ts-node src/seed-savings.ts"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^3.1.3",
