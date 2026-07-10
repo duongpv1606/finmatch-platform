@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { ProductCategory } from '../product.entity';
+import { LoanType, ProductCategory } from '../product.entity';
 
 const SORTABLE_FIELDS = ['interestRate', 'rating', 'bankName', 'name', 'updatedAt'];
 
@@ -8,6 +8,10 @@ export class SearchProductsDto {
   @IsOptional()
   @IsIn(Object.values(ProductCategory))
   category?: ProductCategory;
+
+  @IsOptional()
+  @IsIn(Object.values(LoanType))
+  loanType?: LoanType;
 
   @IsOptional()
   @IsString()

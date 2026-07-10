@@ -30,9 +30,24 @@ export type ProductCategory =
   | "invest"
   | "savings";
 
+export type LoanType = "mua_nha" | "mua_oto" | "kinh_doanh" | "tieu_dung" | "the_chap";
+
+export const LOAN_TYPE_LABEL: Record<LoanType, string> = {
+  mua_nha: "Vay mua nhà",
+  mua_oto: "Vay mua ô tô",
+  kinh_doanh: "Vay kinh doanh",
+  tieu_dung: "Vay tiêu dùng",
+  the_chap: "Vay thế chấp",
+};
+
+// Consumer-finance companies never offer secured/mortgage loans — mirrors
+// the same real rule enforced server-side in ProductsService.
+export const CONSUMER_FINANCE_BANK_IDS = ["mcredit", "hd-saison", "fe-credit", "mirae-asset"];
+
 export interface FinancialProduct {
   id: string;
   category: ProductCategory;
+  loanType?: LoanType; // only meaningful when category === "loan"
   bankId: string;
   bankName: string;
   bankLogoUrl: string;

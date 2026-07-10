@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FinancialProduct, ProductCategory } from "@/types";
+import { FinancialProduct, ProductCategory, LoanType, LOAN_TYPE_LABEL, CONSUMER_FINANCE_BANK_IDS } from "@/types";
 import { CreateProductInput, createProduct, updateProduct } from "@/services/productsService";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { uploadAsset } from "@/services/uploadService";
@@ -24,6 +24,7 @@ export function AdminProductForm({
   onCancel: () => void;
 }) {
   const [category, setCategory] = useState<ProductCategory>(editing?.category ?? "loan");
+  const [loanType, setLoanType] = useState<LoanType | "">(editing?.loanType ?? "");
   const [bankId, setBankId] = useState(editing?.bankId ?? "");
   const [bankName, setBankName] = useState(editing?.bankName ?? "");
   const [bankLogoUrl, setBankLogoUrl] = useState(editing?.bankLogoUrl ?? "");
@@ -42,6 +43,11 @@ export function AdminProductForm({
       setError("Điền đủ Ngân hàng, Tên sản phẩm, và lãi suất hợp lệ (0-100%)");
       return;
     }
+    const effectiveBankId = bankId || bankName.toLowerCase().replace(/\s+/g, "-");
+    if (loanType === "the_chap" && CONSUMER_FINANCE_BANK_IDS.includes(effectiveBankId)) {
+      setError("Công ty tài chính tiêu dùng này không có sản phẩm Vay thế chấp");
+      return;
+    }
     setSaving(true);
     try {
       const tagList = tags
@@ -54,6 +60,7 @@ export function AdminProductForm({
           bankName,
           bankLogoUrl: bankLogoUrl || undefined,
           name,
+          loanType: category === "loan" && loanType ? loanType : undefined,
           interestRate,
           minAmount: Math.round(minAmount * 1e6),
           maxAmount: Math.round(maxAmount * 1e6),
@@ -63,6 +70,7 @@ export function AdminProductForm({
       } else {
         const input: CreateProductInput = {
           category,
+          loanType: category === "loan" && loanType ? loanType : undefined,
           bankId: bankId || bankName.toLowerCase().replace(/\s+/g, "-"),
           bankName,
           bankLogoUrl: bankLogoUrl || undefined,
@@ -126,6 +134,28 @@ export function AdminProductForm({
             placeholder="Vay mua nhà lãi suất ưu đãi"
           />
         </div>
+        {category === "loan" && (
+          <div className="calc-input-group" style={{ gridColumn: "span 2" }}>
+            <label className="calc-label">Loại vay</label>
+            <select
+              className="calc-input"
+              value={loanType}
+              onChange={(e) => setLoanType(e.target.value as LoanType)}
+            >
+              <option value="">— Chọn loại vay —</option>
+              {(Object.keys(LOAN_TYPE_LABEL) as LoanType[]).map((lt) => {
+                const effectiveBankId = bankId || bankName.toLowerCase().replace(/\s+/g, "-");
+                const isBlocked = lt === "the_chap" && CONSUMER_FINANCE_BANK_IDS.includes(effectiveBankId);
+                return (
+                  <option key={lt} value={lt} disabled={isBlocked}>
+                    {LOAN_TYPE_LABEL[lt]}
+                    {isBlocked ? " (không áp dụng cho công ty tài chính tiêu dùng)" : ""}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        )}
         <div className="calc-input-group">
           <label className="calc-label">Lãi suất (%/năm)</label>
           <input

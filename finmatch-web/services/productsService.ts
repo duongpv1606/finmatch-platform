@@ -121,6 +121,7 @@ export async function getRateHistory(
 
 export interface ProductSearchParams {
   category?: ProductCategory;
+  loanType?: FinancialProduct["loanType"];
   q?: string;
   sortBy?: "interestRate" | "rating" | "bankName" | "name" | "updatedAt";
   sortOrder?: "ASC" | "DESC";
@@ -147,6 +148,7 @@ export async function searchProducts(params: ProductSearchParams): Promise<Produ
   }
   const qs = new URLSearchParams();
   if (params.category) qs.set("category", params.category);
+  if (params.loanType) qs.set("loanType", params.loanType);
   if (params.q) qs.set("q", params.q);
   if (params.sortBy) qs.set("sortBy", params.sortBy);
   if (params.sortOrder) qs.set("sortOrder", params.sortOrder);
@@ -160,6 +162,7 @@ export async function searchProducts(params: ProductSearchParams): Promise<Produ
 
 export interface CreateProductInput {
   category: FinancialProduct["category"];
+  loanType?: FinancialProduct["loanType"];
   bankId: string;
   bankName: string;
   bankLogoUrl?: string;
@@ -194,7 +197,7 @@ export async function createProduct(input: CreateProductInput): Promise<Financia
 
 export async function updateProduct(
   id: string,
-  input: Partial<Pick<CreateProductInput, "bankName" | "bankLogoUrl" | "name" | "interestRate" | "minAmount" | "maxAmount" | "tags" | "sourceUrl">>
+  input: Partial<Pick<CreateProductInput, "bankName" | "bankLogoUrl" | "name" | "loanType" | "interestRate" | "minAmount" | "maxAmount" | "tags" | "sourceUrl">>
 ): Promise<FinancialProduct> {
   if (USE_MOCK) {
     return mockDelay({ ...MOCK_PRODUCTS[0], ...input, id } as FinancialProduct);

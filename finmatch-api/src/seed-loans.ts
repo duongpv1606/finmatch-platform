@@ -63,18 +63,24 @@ async function main() {
     // Skip if this bank+name combo already exists, so re-running the
     // script (e.g. after fixing a typo) doesn't create duplicates.
     const existing = await client.query(
-      `SELECT id FROM products WHERE "bankId" = $1 AND category = 'loan' AND name = $2`,
+      `SELECT id, "loanType" FROM products WHERE "bankId" = $1 AND category = 'loan' AND name = $2`,
       [row.bankId, 'Vay tiêu dùng'],
     );
     if ((existing.rowCount ?? 0) > 0) {
-      console.log(`Bỏ qua (đã có): ${row.bankName}`);
+      const existingRow = existing.rows[0];
+      if (!existingRow.loanType) {
+        await client.query(`UPDATE products SET "loanType" = 'tieu_dung' WHERE id = $1`, [existingRow.id]);
+        console.log(`Đã bổ sung loanType cho: ${row.bankName}`);
+      } else {
+        console.log(`Bỏ qua (đã có): ${row.bankName}`);
+      }
       continue;
     }
 
     await client.query(
       `INSERT INTO products
-        (id, category, "bankId", "bankName", name, "interestRate", "minAmount", "maxAmount", "termMonths", tags, "updatedBy")
-       VALUES ($1,'loan',$2,$3,'Vay tiêu dùng',$4,$5,$6,$7,$8,'cms')`,
+        (id, category, "loanType", "bankId", "bankName", name, "interestRate", "minAmount", "maxAmount", "termMonths", tags, "updatedBy")
+       VALUES ($1,'loan','tieu_dung',$2,$3,'Vay tiêu dùng',$4,$5,$6,$7,$8,'cms')`,
       [
         randomUUID(),
         row.bankId,

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product, ProductCategory } from './product.entity';
+import { CONSUMER_FINANCE_BANK_IDS, LoanType, Product, ProductCategory } from './product.entity';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 
 @Injectable()
@@ -9,6 +9,17 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product) private readonly repo: Repository<Product>,
   ) {}
+
+  /** Consumer-finance companies never offer secured/mortgage loans — this
+   * is a real business rule enforced here, not just hidden in the admin
+   * form (a crafted API request must be blocked too). */
+  private assertLoanTypeAllowed(bankId: string, loanType?: LoanType) {
+    if (loanType === LoanType.THE_CHAP && CONSUMER_FINANCE_BANK_IDS.includes(bankId)) {
+      throw new BadRequestException(
+        'Công ty tài chính tiêu dùng (Mcredit/HD SAISON/FE Credit/Mirae Asset) không có sản phẩm Vay thế chấp',
+      );
+    }
+  }
 
   findAll(category?: ProductCategory) {
     return this.repo.find({
@@ -24,6 +35,7 @@ export class ProductsService {
    * recommendation engine, AI grounding, admin list) are untouched. */
   async search(options: {
     category?: ProductCategory;
+    loanType?: LoanType;
     q?: string;
     sortBy?: 'interestRate' | 'rating' | 'bankName' | 'name' | 'updatedAt';
     sortOrder?: 'ASC' | 'DESC';
@@ -38,6 +50,9 @@ export class ProductsService {
     const qb = this.repo.createQueryBuilder('p');
     if (options.category) {
       qb.andWhere('p.category = :category', { category: options.category });
+    }
+    if (options.loanType) {
+      qb.andWhere('p.loanType = :loanType', { loanType: options.loanType });
     }
     if (options.q) {
       qb.andWhere('(p.name ILIKE :q OR p.bankName ILIKE :q)', { q: `%${options.q}%` });
@@ -69,6 +84,7 @@ export class ProductsService {
   }
 
   create(dto: CreateProductDto) {
+    this.assertLoanTypeAllowed(dto.bankId, dto.loanType);
     const product = this.repo.create({ ...dto, updatedBy: 'cms' });
     return this.repo.save(product);
   }
@@ -80,6 +96,9 @@ export class ProductsService {
     const nextMax = dto.maxAmount ?? Number(existing.maxAmount);
     if (nextMin > nextMax) {
       throw new BadRequestException('Hạn mức tối thiểu không được lớn hơn hạn mức tối đa');
+    }
+    if (dto.loanType) {
+      this.assertLoanTypeAllowed(existing.bankId, dto.loanType);
     }
 
     await this.repo.update(id, { ...dto, updatedBy: 'cms' });

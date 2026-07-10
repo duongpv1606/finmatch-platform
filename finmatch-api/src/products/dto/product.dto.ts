@@ -8,11 +8,17 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { ProductCategory } from '../product.entity';
+import { LoanType, ProductCategory } from '../product.entity';
 
 export class CreateProductDto {
   @IsIn(Object.values(ProductCategory))
   category: ProductCategory;
+
+  // Only meaningful when category = 'loan' — validated against the
+  // consumer-finance exclusion rule in ProductsService, not just here.
+  @IsOptional()
+  @IsIn(Object.values(LoanType))
+  loanType?: LoanType;
 
   @IsString()
   bankId: string;
@@ -63,6 +69,10 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @IsOptional()
+  @IsIn(Object.values(LoanType))
+  loanType?: LoanType;
 
   @IsOptional()
   @IsNumber()

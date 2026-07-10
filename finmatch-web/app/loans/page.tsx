@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/AppShell";
-import { ProductCard } from "@/components/home/ProductCard";
+import { LoanTypeTabs } from "@/components/loans/LoanTypeTabs";
 import { getProducts } from "@/services/productsService";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Vay vốn",
-  description: "So sánh lãi suất vay mua nhà, vay tiêu dùng từ các ngân hàng hàng đầu Việt Nam. Cập nhật lãi suất, hạn mức, điều kiện vay realtime.",
+  description: "So sánh lãi suất vay mua nhà, vay mua ô tô, vay kinh doanh, vay tiêu dùng, vay thế chấp từ các ngân hàng hàng đầu Việt Nam. Cập nhật lãi suất, hạn mức, điều kiện vay realtime.",
   alternates: { canonical: "/loans" },
 };
 
@@ -20,15 +20,10 @@ export default async function LoansPage() {
           <div className="sec-eyebrow">Sản phẩm</div>
           <h3>Vay vốn</h3>
           <p className="text-sm text-muted">
-            Danh sách lấy trực tiếp từ services/productsService — sẵn sàng
-            nối API ngân hàng thật, hiện đang dùng dữ liệu mẫu.
+            So sánh vay mua nhà, mua ô tô, kinh doanh, tiêu dùng và thế chấp từ nhiều ngân hàng — lọc theo đúng nhu cầu của bạn.
           </p>
         </div>
-        <div className="grid3">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <LoanTypeTabs products={products} />
       </div>
     </AppShell>
   );

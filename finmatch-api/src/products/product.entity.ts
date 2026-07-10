@@ -14,6 +14,21 @@ export enum ProductCategory {
   SAVINGS = 'savings',
 }
 
+// Only meaningful when category = LOAN. Consumer-finance companies
+// (Mcredit, HD SAISON, FE Credit, Mirae Asset) never offer secured/
+// mortgage loans — enforced in ProductsService, not just hidden in the UI.
+export enum LoanType {
+  MUA_NHA = 'mua_nha',
+  MUA_OTO = 'mua_oto',
+  KINH_DOANH = 'kinh_doanh',
+  TIEU_DUNG = 'tieu_dung',
+  THE_CHAP = 'the_chap',
+}
+
+// Bank IDs that are consumer-finance companies, not banks — they only
+// offer unsecured personal loans, never mortgage/secured loans.
+export const CONSUMER_FINANCE_BANK_IDS = ['mcredit', 'hd-saison', 'fe-credit', 'mirae-asset'];
+
 // node-postgres returns DECIMAL/NUMERIC and BIGINT columns as strings by
 // default (JS numbers can't safely represent all bigint values, and pg
 // doesn't know our decimals are safe). Without this, values like
@@ -30,6 +45,9 @@ export class Product {
 
   @Column({ type: 'enum', enum: ProductCategory })
   category: ProductCategory;
+
+  @Column({ type: 'enum', enum: LoanType, nullable: true })
+  loanType?: LoanType;
 
   @Column()
   bankId: string;
