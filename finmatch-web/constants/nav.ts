@@ -65,6 +65,13 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: "/dashboard/membership", label: "Gói thành viên", icon: "crown", badge: { text: "Mới", color: "var(--purple)" } },
       { href: "/dashboard/community", label: "Cộng đồng", icon: "users" },
       {
+        href: "/dashboard/ai-dashboard",
+        label: "AI Dashboard",
+        icon: "brain",
+        badge: { text: "Live", color: "var(--emerald)" },
+        roles: ["admin", "super_admin"],
+      },
+      {
         href: "/dashboard/admin",
         label: "Admin",
         icon: "shield-lock",

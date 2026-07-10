@@ -1,4 +1,4 @@
-import { USE_MOCK, apiFetch, mockDelay } from "./apiClient";
+import { USE_MOCK, apiFetch, authedFetch, mockDelay } from "./apiClient";
 import { FinancialProduct } from "@/types";
 
 export interface PlatformStats {
@@ -31,4 +31,29 @@ export async function getPlatformStats(): Promise<PlatformStats> {
 export async function getPartnerLogos(): Promise<PartnerLogo[]> {
   if (USE_MOCK) return mockDelay([]);
   return apiFetch<PartnerLogo[]>("/platform/partner-logos");
+}
+
+export interface AdminOverview {
+  totalUsers: number;
+  leadsThisMonth: number;
+  totalLeads: number;
+  totalBanks: number;
+  topProductName: string | null;
+  leadQuality: { high: number; medium: number; low: number };
+  monthlyLeads: { month: string; count: number }[];
+}
+
+export interface AiOverview {
+  chatsToday: number;
+  totalLeadsFromAi: number;
+  hourlyChats: { hour: number; count: number }[];
+  recentActivity: { id: string; text: string; createdAt: string }[];
+}
+
+export async function getAdminOverview(): Promise<AdminOverview> {
+  return authedFetch<AdminOverview>("/platform/admin-overview");
+}
+
+export async function getAiOverview(): Promise<AiOverview> {
+  return authedFetch<AiOverview>("/platform/ai-overview");
 }
