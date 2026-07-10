@@ -10,6 +10,10 @@
 // marketing, not true compounded APR) so every product sorts/compares
 // consistently on one field. The original monthly figure is preserved
 // in the product's tags for transparency.
+// Reads a local .env file automatically (create one with DATABASE_URL set
+// to your Railway Postgres public connection string — see .env.example —
+// so you never have to type `set DATABASE_URL=...` before every run).
+import 'dotenv/config';
 import { Client } from 'pg';
 import { randomUUID } from 'crypto';
 

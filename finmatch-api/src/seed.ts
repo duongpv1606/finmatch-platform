@@ -1,6 +1,11 @@
 // Usage: npm run seed
 // Seeds a few demo products and one admin user so the frontend has
 // something to show without needing to click through the CMS first.
+//
+// Reads a local .env file automatically (create one with DATABASE_URL set
+// to your Railway Postgres public connection string — see .env.example —
+// so you never have to type `set DATABASE_URL=...` before every run).
+import 'dotenv/config';
 import { Client } from 'pg';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';

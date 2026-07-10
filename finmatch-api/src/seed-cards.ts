@@ -12,6 +12,10 @@
 // not an exact VND figure — mapped to an approximate representative range
 // below, clearly documented so it's easy to correct once you have exact
 // numbers per card.
+// Reads a local .env file automatically (create one with DATABASE_URL set
+// to your Railway Postgres public connection string — see .env.example —
+// so you never have to type `set DATABASE_URL=...` before every run).
+import 'dotenv/config';
 import { Client } from 'pg';
 import { randomUUID } from 'crypto';
 
