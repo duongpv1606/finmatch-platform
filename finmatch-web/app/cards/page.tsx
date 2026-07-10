@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 
 export default async function CardsPage() {
   const products = await getProducts("card");
+  // "interestRate" doubles as cashback % for cards — higher is better,
+  // opposite direction from loans/savings where lower is better.
+  const sorted = [...products].sort((a, b) => b.interestRate - a.interestRate);
   return (
     <AppShell title="Thẻ tín dụng">
       <div className="page active" style={{ padding: "22px 28px" }}>
@@ -20,14 +23,16 @@ export default async function CardsPage() {
           <div className="sec-eyebrow">Sản phẩm</div>
           <h3>Thẻ tín dụng</h3>
           <p className="text-sm text-muted">
-            Danh sách lấy trực tiếp từ services/productsService — sẵn sàng
-            nối API ngân hàng thật, hiện đang dùng dữ liệu mẫu.
+            Sắp xếp theo % hoàn tiền cao nhất — cập nhật realtime từ hệ thống.
           </p>
         </div>
         <div className="grid3">
-          {products.map((p) => (
+          {sorted.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
+          {sorted.length === 0 && (
+            <div style={{ color: "var(--gray-400)", fontSize: 13 }}>Chưa có sản phẩm nào.</div>
+          )}
         </div>
       </div>
     </AppShell>

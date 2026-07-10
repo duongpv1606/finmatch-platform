@@ -44,6 +44,17 @@ export function CompareTable() {
     setPage(1);
   }, [tab, sortBy, sortOrder]);
 
+  function handleTabChange(newTab: ProductCategory) {
+    setTab(newTab);
+    // interestRate doubles as cashback % for cards (higher = better) but
+    // annual rate for loans/savings (lower = better) — flip the default
+    // sort direction so "best first" is correct for whichever tab is
+    // active, instead of always defaulting to ascending.
+    if (sortBy === "interestRate") {
+      setSortOrder(newTab === "card" ? "DESC" : "ASC");
+    }
+  }
+
   const params: ProductSearchParams = {
     category: tab,
     q: debouncedSearch || undefined,
@@ -76,7 +87,7 @@ export function CompareTable() {
     <>
       <div className="tabs" style={{ maxWidth: 500 }}>
         {TABS.map((t) => (
-          <div key={t.id} className={`tab${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)}>
+          <div key={t.id} className={`tab${tab === t.id ? " active" : ""}`} onClick={() => handleTabChange(t.id)}>
             {t.label}
           </div>
         ))}
@@ -119,7 +130,7 @@ export function CompareTable() {
                   cursor: "pointer",
                 }}
               >
-                {SORT_LABEL[f]}
+                {f === "interestRate" && tab === "card" ? "Hoàn tiền" : SORT_LABEL[f]}
                 {sortIcon(f)}
               </button>
             ))}
@@ -132,7 +143,7 @@ export function CompareTable() {
               <tr>
                 <th>Ngân hàng</th>
                 <th>Sản phẩm</th>
-                <th>Lãi suất</th>
+                <th>{tab === "card" ? "Hoàn tiền" : "Lãi suất"}</th>
                 <th>Hạn mức</th>
                 <th>Đánh giá</th>
                 <th>Cập nhật</th>
