@@ -5,9 +5,10 @@ import { LeadsService } from './leads.service';
 import { LeadsController } from './leads.controller';
 import { UsersModule } from '../users/users.module';
 import { AiModule } from '../ai/ai.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Lead]), UsersModule, AiModule],
+  imports: [TypeOrmModule.forFeature([Lead]), UsersModule, AiModule, NotificationsModule],
   providers: [LeadsService],
   controllers: [LeadsController],
 })

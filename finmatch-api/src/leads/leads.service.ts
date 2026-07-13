@@ -5,6 +5,7 @@ import { Lead } from './lead.entity';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UsersService } from '../users/users.service';
 import { AiService } from '../ai/ai.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class LeadsService {
@@ -12,6 +13,7 @@ export class LeadsService {
     @InjectRepository(Lead) private readonly repo: Repository<Lead>,
     private readonly users: UsersService,
     private readonly ai: AiService,
+    private readonly notifications: NotificationsGateway,
   ) {}
 
   /** Deterministic pricing tiers by score — transparent, no hidden formula. */
@@ -28,7 +30,19 @@ export class LeadsService {
       region: dto.region ?? 'Không rõ',
       price: this.priceForScore(dto.score),
     });
-    return this.repo.save(lead);
+    const saved = await this.repo.save(lead);
+    this.notifications.notifyNewLead({
+      id: saved.id,
+      customerNameMasked: maskName(saved.customerName),
+      productCategory: saved.productCategory,
+      score: saved.score,
+      price: saved.price,
+      status: saved.status,
+      region: saved.region,
+      source: saved.source,
+      createdAt: saved.createdAt,
+    });
+    return saved;
   }
 
   /** Marketplace listing — available (unpurchased) leads only, with

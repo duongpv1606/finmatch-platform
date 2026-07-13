@@ -17,6 +17,7 @@ import { CommunityModule } from './community/community.module';
 import { MessagesModule } from './messages/messages.module';
 import { UploadModule } from './upload/upload.module';
 import { PlatformModule } from './platform/platform.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { PlatformModule } from './platform/platform.module';
     MessagesModule,
     UploadModule,
     PlatformModule,
+    NotificationsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DirectMessage } from './direct-message.entity';
 import { UsersService } from '../users/users.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 export interface ConversationSummary {
   userId: string;
@@ -18,6 +19,7 @@ export class MessagesService {
   constructor(
     @InjectRepository(DirectMessage) private readonly repo: Repository<DirectMessage>,
     private readonly users: UsersService,
+    private readonly notifications: NotificationsGateway,
   ) {}
 
   async send(
@@ -42,7 +44,9 @@ export class MessagesService {
       receiverRole: receiver.role,
       text,
     });
-    return this.repo.save(message);
+    const saved = await this.repo.save(message);
+    this.notifications.notifyNewMessage(toUserId, saved);
+    return saved;
   }
 
   /** Groups all messages involving this user into one row per conversation
