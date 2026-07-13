@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,6 +26,7 @@ export class Lead {
   email?: string;
 
   @Column({ type: 'enum', enum: ['register', 'ai_chat', 'compare', 'manual'], default: 'ai_chat' })
+  @Index()
   source: LeadSource;
 
   @Column({ type: 'enum', enum: ProductCategory, default: ProductCategory.LOAN })
@@ -41,6 +43,7 @@ export class Lead {
     enum: ['new', 'contacted', 'qualified', 'converted', 'lost'],
     default: 'new',
   })
+  @Index()
   status: LeadStatus;
 
   @Column({ default: 'Không rõ' })
@@ -49,6 +52,7 @@ export class Lead {
   // Set once purchased — enforces "no duplicate sale": a lead can only
   // ever be bought once (null = still available in the marketplace).
   @Column({ nullable: true })
+  @Index()
   purchasedBySaleId?: string;
 
   @Column({ type: 'timestamptz', nullable: true })

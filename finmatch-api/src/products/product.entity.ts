@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -44,12 +45,15 @@ export class Product {
   id: string;
 
   @Column({ type: 'enum', enum: ProductCategory })
+  @Index()
   category: ProductCategory;
 
   @Column({ type: 'enum', enum: LoanType, nullable: true })
+  @Index()
   loanType?: LoanType;
 
   @Column()
+  @Index()
   bankId: string;
 
   @Column()

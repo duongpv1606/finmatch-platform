@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('chat_messages')
+@Index(['role', 'createdAt'])
 export class ChatMessageEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -8,6 +9,7 @@ export class ChatMessageEntity {
   // Groups messages into one conversation. Equal to the userId when logged
   // in, or a client-generated UUID for anonymous/guest sessions.
   @Column()
+  @Index()
   sessionId: string;
 
   @Column({ nullable: true })

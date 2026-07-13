@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Patch, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { LeadsService } from './leads.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadCrmDto } from './dto/update-lead-crm.dto';
@@ -19,7 +20,9 @@ export class LeadsController {
 
   // Public — the AI chat flow calls this the moment it captures a
   // name+phone, no login required (matches the original's anonymous
-  // lead-capture UX).
+  // lead-capture UX). Rate-limited to prevent spam-flooding fake leads
+  // into the marketplace.
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post()
   create(@Body() dto: CreateLeadDto) {
     return this.leads.create(dto);

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('direct_messages')
 export class DirectMessage {
@@ -6,6 +6,7 @@ export class DirectMessage {
   id: string;
 
   @Column()
+  @Index()
   senderId: string;
 
   @Column()
@@ -15,6 +16,7 @@ export class DirectMessage {
   senderRole: string;
 
   @Column()
+  @Index()
   receiverId: string;
 
   @Column()
